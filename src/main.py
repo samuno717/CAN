@@ -1,4 +1,7 @@
 from tqdm import tqdm
+import os
+from config import DATA_DIR
+import argparse
 
 ids = set()
 first_log_timestamp = None
@@ -7,7 +10,14 @@ previous_time_for_id = {}
 
 TOTAL_LINES = 5910615
 
-with open('candump-2026-04-02_201058.log', 'r') as logfile, open('processed_data.csv', 'w') as csvfile:
+parser = argparse.ArgumentParser(description="CAN raw frame parser.")
+parser.add_argument("filename", type=str, help="File with raw CAN data, for example: candump-2026-04-02_201058.log")
+args = parser.parse_args()
+
+log_file_path = DATA_DIR / args.filename
+csv_file_path = os.path.join(DATA_DIR, 'processed_data.csv')
+
+with open(log_file_path, 'r') as logfile, open(csv_file_path, 'w') as csvfile:
     csvfile.write("Timestamp,delta_t,CAN_ID,Byte1,Byte2,Byte3,Byte4,Byte5,Byte6,Byte7,Byte8\n")
 
     for l in tqdm(logfile, total=TOTAL_LINES, desc="Processing frames", unit=" frame"):
@@ -41,13 +51,16 @@ with open('candump-2026-04-02_201058.log', 'r') as logfile, open('processed_data
         csvline = f"{current_timestamp},{delta_t},{can_id},{payload_str}\n"
         csvfile.write(csvline)
 
+print("\nDONE")
+print("File created: processed_data.csv in data folder.")
+
 ecu_count = len(ids)
 total_time = final_log_timestamp - first_log_timestamp
 
 
 
-print("\n" + "-" * 50)
+print("\n" + "-" * 30)
 print(f"Unique ECUs: {ecu_count}")
 print(f"Total time: {total_time:.2f} seconds")
 print(f"Total frames: {TOTAL_LINES}")
-print("\n" + "-" * 50)
+print("-" * 30)
