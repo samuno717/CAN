@@ -9,12 +9,12 @@ from data_profiling import ProfileReport
 import os
 
 
-datafile = DATA_DIR / 'processed_data.csv'
+datafile = 'processed_data.csv'
 
 if datafile not in os.listdir(DATA_DIR):
     sys.exit("ERROR: Processed data file not present in data folder! Run src.main.py")
 
-df = pd.read_csv()
+df = pd.read_csv(DATA_DIR / datafile)
 
 profile = ProfileReport(df, title="Raport CAN")
 profile.to_file(DATA_DIR / "report.html")
