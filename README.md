@@ -1,23 +1,34 @@
 # CAN Bus Anomaly Detection Baseline
 
-## Installation
+## Dependencies
+Make sure to have `uv` installed:
 
-### 1. Create and activate venv
-
-```sh
-python -m venv venv
-source venv/Scripts/activate
+Windows:
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm [https://astral.sh/uv/install.ps1](https://astral.sh/uv/install.ps1) | iex"
 ```
 
-### 2. Install libraries
+macOS / Linux:
+```sh
+curl -LsSf [https://astral.sh/uv/install.sh](https://astral.sh/uv/install.sh) | sh
+```
+
+## Installation
+
+### 1. Clone the repository
+```sh
+git clone https://github.com/samuno717/CAN
+```
+
+### 2. Sync using uv
 
 ```sh
-pip install -r requirements.txt
+uv sync
 ```
 
 ## Usage
 
-### 1. CAN data processing
+### CAN data processing
 
 To run the main process and generate `processed_data.csv`, execute the `main.py` script.
 
@@ -25,8 +36,14 @@ To run the main process and generate `processed_data.csv`, execute the `main.py`
 python -m src.main <filename>
 ```
 
+### Generating a data report
+Make sure to run main.py first to parse the data. This will output `report.html` file.
 
-### 2. Generating Model Baselines
+```sh
+python -m src.report_generator
+```
+
+### Generating Model Baselines
 
 To view the experiments with activation functions and model architectures, you can run the Jupyter notebook.
 
