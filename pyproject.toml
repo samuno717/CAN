@@ -1,0 +1,14 @@
+[project]
+name = "can"
+version = "0.1.0"
+description = "CAN bus data IDS using LSTM/AE"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "ipykernel>=7.2.0",
+    "matplotlib>=3.10.9",
+    "pandas>=3.0.3",
+    "scikit-learn>=1.9.0",
+    "tensorflow>=2.21.0",
+    "tqdm>=4.68.1",
+]
