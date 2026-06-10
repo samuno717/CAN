@@ -1,4 +1,4 @@
-# CAN Bus Anomaly Detection Baseline
+# CAN Bus Anomaly Detection
 
 ## Dependencies
 Make sure to have `uv` installed:
