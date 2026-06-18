@@ -38,6 +38,8 @@ with open(log_file_path, 'r') as logfile, open(csv_file_path, 'w') as csvfile:
         split_payload = [raw_payload[i:i+2] for i in range(0, len(raw_payload), 2)]
         payload = [int(i, 16) for i in split_payload]
 
+        payload += [0] * (8 - len(payload))
+
         if can_id in previous_time_for_id:
             delta_t = current_timestamp - previous_time_for_id[can_id]
         else:
