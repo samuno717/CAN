@@ -30,23 +30,26 @@ uv sync
 
 ### CAN data processing
 
-To run the main process and generate `processed_data.csv`, execute the `main.py` script.
+To run the main process and generate `processed_data.csv`, execute the `data_parser.py` script.
 
 ```sh
-python -m src.main <filename>
+python -m src.data_parser <filename>
 ```
 
 ### Generating a data report
-Make sure to run main.py first to parse the data. This will output `report.html` file.
+Make sure to run ``data_parser.py`` first to parse the data. 
+\
+\
+Run this command and it will output `report.html` file in the `/data` folder
 
 ```sh
 python -m src.report_generator
 ```
 
-### Generating Model Baselines
+### Generating Charts
 
-To view the experiments with activation functions and model architectures, you can run the Jupyter notebook.
+To generate charts simply run the corresponding notebooks. The charts will appear in the `/charts` directory.
 
-This notebok will process the `processed_data.csv`, train a model for each valid CAN ID, and print the progress to the console. 
-The final output will be a DataFrame and a plot showing the learned MSE thresholds.
+Each notebok will process the `processed_data.csv`, so make sure to run `data_parser.py` first. 
+
 

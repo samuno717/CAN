@@ -12,7 +12,7 @@ import os
 datafile = 'processed_data.csv'
 
 if datafile not in os.listdir(DATA_DIR):
-    sys.exit("ERROR: Processed data file not present in data folder! Run src.main.py")
+    sys.exit("ERROR: Processed data file not present in data folder! Run src.data_parser.py")
 
 df = pd.read_csv(DATA_DIR / datafile)
 
