@@ -48,8 +48,11 @@ python -m src.report_generator
 
 ### Generating Charts
 
-To generate charts simply run the corresponding notebooks. The charts will appear in the `/charts` directory.
+To generate charts simply run the corresponding notebooks in `/notebooks` directory. The charts will appear in the `/charts` directory.
 
 Each notebok will process the `processed_data.csv`, so make sure to run `data_parser.py` first. 
+
+For now there are 2 available chart generators. In each you are capable of changing the parameters to adjust the chart.
+
 
 
