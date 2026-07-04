@@ -3,3 +3,4 @@ venv/
 .idea/
 __pycache__/
 data/processed_data.csv
+data/*.html
