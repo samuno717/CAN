@@ -2,5 +2,11 @@
 venv/
 .idea/
 __pycache__/
-data/processed_data.csv
-data/*.html
+.pytest_cache/
+outputs/
+*.pyc
+tests/
+
+data/processed/processed_data.csv
+data/processed/sample.csv
+data/raw/*.log
