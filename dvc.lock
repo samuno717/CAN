@@ -1,0 +1,235 @@
+schema: '2.0'
+stages:
+  process_data:
+    cmd: python -m scripts.data_parse
+    deps:
+    - path: src/utils/raw_data_parser.py
+      hash: md5
+      md5: b8869069cfd22ef2411fa61e799eea22
+      size: 2307
+    params:
+      params.yaml:
+        data.input_file_path: data/raw/candump-2026-04-28_162402.log
+        data.output_file_path: data/processed/processed_data.csv
+    outs:
+    - path: data/processed/processed_data.csv
+      hash: md5
+      md5: d3a3d8b408ce1a876868789d8851eca0
+      size: 316159234
+  prepare_tensors:
+    cmd: python -m scripts.dvc_stages.prepare_tensors
+    deps:
+    - path: data/processed/processed_data.csv
+      hash: md5
+      md5: d3a3d8b408ce1a876868789d8851eca0
+      size: 316159234
+    - path: scripts/dvc_stages/prepare_tensors.py
+      hash: md5
+      md5: a13ad6a068c6d420e1271894dd899325
+      size: 1535
+    - path: src/utils/tensor_prep/preprocess.py
+      hash: md5
+      md5: 67774f93af8521518e664ca8480734a2
+      size: 731
+    - path: src/utils/tensor_prep/scale_features.py
+      hash: md5
+      md5: a3406cb4f176869538b82b1353d03375
+      size: 773
+    params:
+      params.yaml:
+        tensor_data.train_split: 0.8
+    outs:
+    - path: data/processed/tensors/tensors.npy
+      hash: md5
+      md5: 0e1b116165413831f1dfa7674c0210bb
+      size: 491763296
+    - path: data/processed/tensors/tensors_val.npy
+      hash: md5
+      md5: 0fbc1b0560cecf8abd8db4929b6b9b39
+      size: 122940920
+    - path: src/models/scalers/bytes_scaler.pkl
+      hash: md5
+      md5: bfb7a07295e77dfa3419ab524b05ded4
+      size: 1303
+    - path: src/models/scalers/time_scaler.pkl
+      hash: md5
+      md5: 7a2c9e59ac91e03fdc86fe653cea6845
+      size: 975
+  train:
+    cmd: python -m scripts.dvc_stages.train
+    deps:
+    - path: data/processed/tensors/tensors.npy
+      hash: md5
+      md5: 0e1b116165413831f1dfa7674c0210bb
+      size: 491763296
+    - path: scripts/dvc_stages/train.py
+      hash: md5
+      md5: 0fdadc1dc063f32dc45dda210f8470c6
+      size: 1738
+    - path: src/models/ae_lstm.py
+      hash: md5
+      md5: 954994de0392473cadb2897029ef1f86
+      size: 1300
+    - path: src/utils/EcuDataset.py
+      hash: md5
+      md5: 08358f539d85c2c0b1c113ef0e322153
+      size: 541
+    - path: src/utils/trainer.py
+      hash: md5
+      md5: 61bbb549cb5a98c4678ed7d8c26a3ce4
+      size: 1626
+    params:
+      params.yaml:
+        model.hidden_size: 64
+        model.num_features: 26
+        model.sequence_length: 64
+        training.batch_size: 512
+        training.epochs: 10
+        training.learning_rate: 0.001
+    outs:
+    - path: src/models/weights/ae_lstm_can_model_h64.pth
+      hash: md5
+      md5: 72882e7d90104f44098e5a5651e2071e
+      size: 236928
+  evaluate:
+    cmd: python -m scripts.dvc_stages.evaluate
+    deps:
+    - path: data/processed/tensors/tensors_val.npy
+      hash: md5
+      md5: 0fbc1b0560cecf8abd8db4929b6b9b39
+      size: 122940920
+    - path: scripts/dvc_stages/evaluate.py
+      hash: md5
+      md5: 947e77bf9e1f3d21c599a745c38757fb
+      size: 2281
+    - path: src/models/ae_lstm.py
+      hash: md5
+      md5: 954994de0392473cadb2897029ef1f86
+      size: 1300
+    - path: src/models/weights/ae_lstm_can_model_h64.pth
+      hash: md5
+      md5: 72882e7d90104f44098e5a5651e2071e
+      size: 236928
+    - path: src/utils/EcuDataset.py
+      hash: md5
+      md5: 08358f539d85c2c0b1c113ef0e322153
+      size: 541
+    - path: src/utils/evaluator.py
+      hash: md5
+      md5: 887e3f6d23ea4daa1cc2d3dad3d53ef6
+      size: 3849
+    params:
+      params.yaml:
+        detection.percentile: 99.9
+        model.hidden_size: 64
+        model.num_features: 26
+        model.sequence_length: 64
+        training.batch_size: 512
+    outs:
+    - path: plots/reconstruction_error_h64.png
+      hash: md5
+      md5: cdb26b20ff304f712861aa4edac287db
+      size: 912985
+    - path: reports/metrics/threshold.json
+      hash: md5
+      md5: f8a3f37722b7856674638e042ffa888d
+      size: 68
+  parse_data:
+    cmd: python -m scripts.dvc_stages.data_parse
+    deps:
+    - path: data/raw/candump-2026-04-28_162402.log
+      hash: md5
+      md5: 59b611182ad48343383544da3c8354b5
+      size: 269026994
+    - path: scripts/dvc_stages/data_parse.py
+      hash: md5
+      md5: e3342a97684689c4e7439f7eb01b1045
+      size: 536
+    - path: src/utils/raw_data_parser.py
+      hash: md5
+      md5: e943c972e673643058fcbca33993b4f9
+      size: 2206
+    outs:
+    - path: data/processed/processed_data.csv
+      hash: md5
+      md5: d3a3d8b408ce1a876868789d8851eca0
+      size: 316159234
+  generate_dos:
+    cmd: python -m scripts.dvc_stages.generate_dos
+    deps:
+    - path: data/processed/tensors/tensors_val.npy
+      hash: md5
+      md5: 0fbc1b0560cecf8abd8db4929b6b9b39
+      size: 122940920
+    - path: scripts/dvc_stages/generate_dos.py
+      hash: md5
+      md5: dcc26d78b1e481a74829815f2cbe0bf6
+      size: 753
+    - path: src/attacks/dos_generator.py
+      hash: md5
+      md5: aff767174fe882747cf378bc9f511ac7
+      size: 1423
+    params:
+      params.yaml:
+        attacks.dos.duration_rows: 3000
+        attacks.dos.start_row: 5000
+        attacks.dos.target_id_col: 9
+    outs:
+    - path: attacks/dos_labels.npy
+      hash: md5
+      md5: 752c38d457d1eecb3beee11870d6ae91
+      size: 1182251
+    - path: attacks/dos_tensors.npy
+      hash: md5
+      md5: 5c92c1415e525dec9c579638edd4fede
+      size: 122940920
+  evaluate_dos:
+    cmd: python -m scripts.dvc_stages.evaluate_dos
+    deps:
+    - path: attacks/dos_labels.npy
+      hash: md5
+      md5: 752c38d457d1eecb3beee11870d6ae91
+      size: 1182251
+    - path: attacks/dos_tensors.npy
+      hash: md5
+      md5: 5c92c1415e525dec9c579638edd4fede
+      size: 122940920
+    - path: reports/metrics/threshold.json
+      hash: md5
+      md5: f8a3f37722b7856674638e042ffa888d
+      size: 68
+    - path: scripts/dvc_stages/evaluate_dos.py
+      hash: md5
+      md5: 8b9722c4918bed2a2dbde8c7bd576504
+      size: 3391
+    - path: src/models/ae_lstm.py
+      hash: md5
+      md5: 954994de0392473cadb2897029ef1f86
+      size: 1300
+    - path: src/models/weights/ae_lstm_can_model_h64.pth
+      hash: md5
+      md5: 72882e7d90104f44098e5a5651e2071e
+      size: 236928
+    - path: src/utils/EcuDataset.py
+      hash: md5
+      md5: 08358f539d85c2c0b1c113ef0e322153
+      size: 541
+    - path: src/utils/evaluate_attack.py
+      hash: md5
+      md5: 1ea683cc54e7ee7a27d2579e877244a7
+      size: 5540
+    params:
+      params.yaml:
+        model.hidden_size: 64
+        model.num_features: 26
+        model.sequence_length: 64
+        training.batch_size: 512
+    outs:
+    - path: plots/dos_attack_reaction_h64.png
+      hash: md5
+      md5: 65e6933299fad733f44611cb758c64c5
+      size: 336939
+    - path: reports/metrics/dos_metrics_h64.json
+      hash: md5
+      md5: a73c40ad2f4fb6c3563caaf7e06d027e
+      size: 308

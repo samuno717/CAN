@@ -1,0 +1,100 @@
+stages:
+  parse_data:
+    cmd: python -m scripts.dvc_stages.data_parse
+    deps:
+      - scripts/dvc_stages/data_parse.py
+      - src/utils/raw_data_parser.py
+      - data/raw/candump-2026-04-28_162402.log
+    outs:
+      - data/processed/processed_data.csv
+
+
+  prepare_tensors:
+    cmd: python -m scripts.dvc_stages.prepare_tensors
+    deps:
+      - scripts/dvc_stages/prepare_tensors.py
+      - src/utils/tensor_prep/preprocess.py
+      - src/utils/tensor_prep/scale_features.py
+      - data/processed/processed_data.csv
+    params:
+      - tensor_data.train_split
+    outs:
+      - src/models/scalers/bytes_scaler.pkl
+      - src/models/scalers/time_scaler.pkl
+      - data/processed/tensors/tensors.npy
+      - data/processed/tensors/tensors_val.npy
+
+
+  train:
+    cmd: python -m scripts.dvc_stages.train
+    deps:
+      - scripts/dvc_stages/train.py
+      - src/models/ae_lstm.py
+      - src/utils/trainer.py
+      - src/utils/EcuDataset.py
+      - data/processed/tensors/tensors.npy
+    params:
+      - model.hidden_size
+      - model.sequence_length
+      - model.num_features
+      - training.batch_size
+      - training.epochs
+      - training.learning_rate
+    outs:
+      - src/models/weights/ae_lstm_can_model_h${model.hidden_size}.pth
+
+
+  evaluate:
+    cmd: python -m scripts.dvc_stages.evaluate
+    deps:
+      - scripts/dvc_stages/evaluate.py
+      - src/models/ae_lstm.py
+      - data/processed/tensors/tensors_val.npy
+      - src/utils/EcuDataset.py
+      - src/utils/evaluator.py
+      - src/models/weights/ae_lstm_can_model_h${model.hidden_size}.pth
+    params:
+      - model.hidden_size
+      - model.sequence_length
+      - model.num_features
+      - training.batch_size
+      - detection.percentile
+    outs:
+      - reports/metrics/threshold.json
+      - plots/reconstruction_error_h${model.hidden_size}.png
+
+
+  generate_dos:
+    cmd: python -m scripts.dvc_stages.generate_dos
+    deps:
+      - scripts/dvc_stages/generate_dos.py
+      - src/attacks/dos_generator.py
+      - data/processed/tensors/tensors_val.npy
+    params:
+      - attacks.dos.start_row
+      - attacks.dos.duration_rows
+      - attacks.dos.target_id_col
+    outs:
+      - attacks/dos_tensors.npy
+      - attacks/dos_labels.npy
+
+  evaluate_dos:
+    cmd: python -m scripts.dvc_stages.evaluate_dos
+    deps:
+      - scripts/dvc_stages/evaluate_dos.py
+      - src/models/ae_lstm.py
+      - src/utils/EcuDataset.py
+      - src/utils/evaluate_attack.py
+      - attacks/dos_tensors.npy
+      - attacks/dos_labels.npy
+      - reports/metrics/threshold.json
+      - src/models/weights/ae_lstm_can_model_h${model.hidden_size}.pth
+    params:
+      - model.hidden_size
+      - model.sequence_length
+      - model.num_features
+      - training.batch_size
+    outs:
+      - reports/metrics/dos_metrics_h${model.hidden_size}.json
+      - plots/dos_attack_reaction_h${model.hidden_size}.png
+
