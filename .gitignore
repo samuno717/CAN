@@ -6,6 +6,7 @@ __pycache__/
 outputs/
 *.pyc
 tests/
+notebooks/
 
 data/processed/processed_data.csv
 data/processed/sample.csv
