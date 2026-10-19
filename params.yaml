@@ -1,27 +1,33 @@
-seed: 42
-
 # STAGE 2: prepare_tensors
-tensor_data:
-  train_split: 0.8
+data_split:
+  train_ratio: 0.70
+  val_ratio: 0.15
 
 # MODEL PARAMS
 model:
   sequence_length: 64
+  sequence_step: 5
   hidden_size: 64
+  latent_dim: 16
   num_features: 26
 
 # STAGE 3: train
 training:
-  epochs: 10
-  batch_size: 512
+  seed: 42
+  epochs: 400
+  batch_size: 4096
   learning_rate: 0.001
 
 detection:
   percentile: 99.9
+  persistence_k: 10
 
 attacks:
   dos:
     start_row: 5000
-    duration_rows: 3000
+    duration_rows: 300
     target_id_col: 9
+    injection_ratio: 1
+    delta_t_val: 0.05
+    payload_val: 1.0        # 0xFF
 

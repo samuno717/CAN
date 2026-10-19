@@ -1,3 +1,4 @@
 /reconstruction_error_detailed.png
-/reconstruction_error_h64.png
-/dos_attack_reaction_h64.png
+/reconstruction_error_h*
+/dos_attack_reaction_ir*
+/seeds_convergence_comparison.png

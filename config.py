@@ -6,9 +6,10 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 DATA_DIR = PROJECT_ROOT / 'data'
 RAW_DATA_DIR = DATA_DIR / 'raw'
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
-TENSORS_DIR = PROCESSED_DATA_DIR / "tensors"
-TENSORS_PATH = TENSORS_DIR / "tensors.npy"
-TENSORS_VAL_PATH = TENSORS_DIR / "tensors_val.npy"
+FEATURES_DIR = PROCESSED_DATA_DIR / "features"
+FEATURES_TRAIN_PATH = FEATURES_DIR / "train_scaled.npy"
+FEATURES_VAL_PATH = FEATURES_DIR / "val_scaled.npy"
+FEATURES_TEST_PATH = FEATURES_DIR / "test_scaled.npy"
 
 SRC_DIR = PROJECT_ROOT / 'src'
 MODELS_DIR = SRC_DIR / "models"
@@ -20,6 +21,7 @@ TIME_SCALER_PATH = SCALERS_DIR / "time_scaler.pkl"
 ATTACKS_DIR = PROJECT_ROOT / "attacks"
 
 REPORTS_DIR = PROJECT_ROOT / "reports"
+METRICS_DIR = REPORTS_DIR / "metrics"
 
 PLOTS_DIR = PROJECT_ROOT / 'plots'
 

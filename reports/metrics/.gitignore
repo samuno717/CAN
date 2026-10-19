@@ -1,2 +1,8 @@
 /threshold.json
 /dos_metrics_h64.json
+/dos_metrics_h32.json
+/dos_eval_metrics.json
+/dos_eval_metrics_p3.json
+/dos_eval_metrics_p5.json
+/dos_eval_metrics_p10.json
+/history_h64_seed42.json

@@ -1,1 +1,11 @@
 /ae_lstm_can_model_h64.pth
+/ae_lstm_can_model_h64_seed_42.pth
+/ae_lstm_can_model_h64_e15.pth
+/ae_lstm_can_model_h32_e1.pth
+/ae_lstm_can_model_h64_e1.pth
+/ae_lstm_can_model_h128_e1.pth
+/ae_lstm_can_model_h32_e15.pth
+/ae_lstm_can_model_h128_e15.pth
+/ae_lstm_model_h32_e15.pth
+/ae_lstm_can_model_h64_e2.pth
+/ae_lstm_can_model_h64_e400.pth
