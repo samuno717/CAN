@@ -12,21 +12,21 @@ dependencies = [
     "tqdm",
     "numpy<2.0.0",
     "torch",
-    "torchvision",
-    "torchaudio",
-    "hydra-core>=1.3.4",
+    "hydra-core>=1.3.2,<1.4.0",
     "dvc>=3.67.1",
     "loguru>=0.7.3",
-    "pathlib>=1.0.1",
-    "omegaconf>=2.3.1",
     "psutil>=7.2.2",
+    "nvidia-ml-py>=13.610.43",
 ]
 
+[tool.uv]
+prerelease = "allow"
+environments = ["sys_platform == 'win32'"]
+
 [[tool.uv.index]]
-name = "pytorch-cu124"
-url = "https://download.pytorch.org/whl/cu124"
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/nightly/cu128"
+explicit = true
 
 [tool.uv.sources]
-torch = { index = "pytorch-cu124" }
-torchvision = { index = "pytorch-cu124" }
-torchaudio = { index = "pytorch-cu124" }
+torch = { index = "pytorch-cu128" }

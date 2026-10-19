@@ -9,20 +9,22 @@ stages:
       - data/processed/processed_data.csv
 
 
-  prepare_tensors:
-    cmd: python -m scripts.dvc_stages.prepare_tensors
+  preprocess_features:
+    cmd: python -m scripts.dvc_stages.preprocess_features
     deps:
-      - scripts/dvc_stages/prepare_tensors.py
-      - src/utils/tensor_prep/preprocess.py
-      - src/utils/tensor_prep/scale_features.py
+      - scripts/dvc_stages/preprocess_features.py
+      - src/utils/feature_prep/preprocess.py
+      - src/utils/feature_prep/scale_features.py
       - data/processed/processed_data.csv
     params:
-      - tensor_data.train_split
+      - data_split.train_ratio
+      - data_split.val_ratio
     outs:
       - src/models/scalers/bytes_scaler.pkl
       - src/models/scalers/time_scaler.pkl
-      - data/processed/tensors/tensors.npy
-      - data/processed/tensors/tensors_val.npy
+      - data/processed/features/train_scaled.npy
+      - data/processed/features/val_scaled.npy
+      - data/processed/features/test_scaled.npy
 
 
   train:
@@ -31,17 +33,75 @@ stages:
       - scripts/dvc_stages/train.py
       - src/models/ae_lstm.py
       - src/utils/trainer.py
-      - src/utils/EcuDataset.py
-      - data/processed/tensors/tensors.npy
+      - src/utils/FastTensorDataLoader.py
+      - data/processed/features/train_scaled.npy
     params:
-      - model.hidden_size
       - model.sequence_length
+      - model.sequence_step
+      - model.hidden_size
+      - model.latent_dim
       - model.num_features
-      - training.batch_size
+      - training.seed
       - training.epochs
+      - training.batch_size
       - training.learning_rate
     outs:
-      - src/models/weights/ae_lstm_can_model_h${model.hidden_size}.pth
+      - src/models/weights/ae_lstm_can_model_h${model.hidden_size}_e${training.epochs}.pth
+      - plots/training_loss_history/train_loss_h${model.hidden_size}_seed${training.seed}.svg
+      - reports/metrics/history_h${model.hidden_size}_seed${training.seed}.json
+
+
+#  train_bottleneck:
+#    matrix:
+#      hidden_size: [32, 64, 128]
+#    cmd: python -m scripts.dvc_stages.train model.hidden_size=${item.hidden_size}
+#    deps:
+#      - scripts/dvc_stages/train.py
+#      - src/models/ae_lstm.py
+#      - src/utils/trainer.py
+#      - src/utils/EcuDataset.py
+#      - data/processed/tensors/tensors.npy
+#    params:
+#      - model.hidden_size
+#      - model.sequence_length
+#      - model.num_features
+#      - training.batch_size
+#      - training.epochs
+#      - training.learning_rate
+#    outs:
+#      - src/models/weights/ae_lstm_can_model_h${item.hidden_size}_e${training.epochs}.pth
+
+
+
+#  train:
+#    foreach: [ 1, 2, 3, 4, 5 ]
+#    do:
+#      cmd: python -m scripts.dvc_stages.train training.seed=${item}
+#      deps:
+#        - scripts/dvc_stages/train.py
+#        - src/models/ae_lstm.py
+#        - src/utils/trainer.py
+#        - src/utils/EcuDataset.py
+#        - data/processed/tensors/tensors.npy
+#      params:
+#        - model.hidden_size
+#        - model.sequence_length
+#        - model.num_features
+#        - training.batch_size
+#        - training.epochs
+#        - training.learning_rate
+#      outs:
+#        - src/models/weights/ae_lstm_can_model_h${model.hidden_size}_seed_${item}.pth
+#        - reports/metrics/history_h${model.hidden_size}_seed_${item}.json
+
+
+#  compare_seeds:
+#    cmd: python -m scripts.plot_makers.plot_seeds_comparison
+#    deps:
+#      - scripts/plot_makers/plot_seeds_comparison.py
+#      - reports/metrics
+#    outs:
+#      - plots/seeds_convergence_comparison.png
 
 
   evaluate:
@@ -49,10 +109,10 @@ stages:
     deps:
       - scripts/dvc_stages/evaluate.py
       - src/models/ae_lstm.py
-      - data/processed/tensors/tensors_val.npy
-      - src/utils/EcuDataset.py
+      - data/processed/features/val_scaled.npy
+      - src/utils/FastTensorDataLoader.py
       - src/utils/evaluator.py
-      - src/models/weights/ae_lstm_can_model_h${model.hidden_size}.pth
+      - src/models/weights/ae_lstm_can_model_h${model.hidden_size}_e${training.epochs}.pth
     params:
       - model.hidden_size
       - model.sequence_length
@@ -60,8 +120,8 @@ stages:
       - training.batch_size
       - detection.percentile
     outs:
-      - reports/metrics/threshold.json
-      - plots/reconstruction_error_h${model.hidden_size}.png
+      - reports/metrics/dos_eval_metrics_p${detection.persistence_k}.json
+      - plots/reconstruction_error_h${model.hidden_size}_e${training.epochs}.svg
 
 
   generate_dos:
@@ -88,7 +148,6 @@ stages:
       - attacks/dos_tensors.npy
       - attacks/dos_labels.npy
       - reports/metrics/threshold.json
-      - src/models/weights/ae_lstm_can_model_h${model.hidden_size}.pth
     params:
       - model.hidden_size
       - model.sequence_length
@@ -96,5 +155,5 @@ stages:
       - training.batch_size
     outs:
       - reports/metrics/dos_metrics_h${model.hidden_size}.json
-      - plots/dos_attack_reaction_h${model.hidden_size}.png
+      - plots/dos_attack_reaction_ir${attacks.dos.injection_ratio}.png
 
