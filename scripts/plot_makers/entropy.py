@@ -1,8 +1,9 @@
-import pandas as pd
-from config import DATA_DIR, PLOTS_DIR
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from scipy.stats import entropy
+
+from config import DATA_DIR, PLOTS_DIR
 
 csv_file_path = DATA_DIR / 'processed' / 'processed_data.csv'
 df = pd.DataFrame(pd.read_csv(csv_file_path))

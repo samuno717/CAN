@@ -1,9 +1,9 @@
-from tqdm import tqdm
-import pandas as pd
-import numpy as np
-from loguru import logger
 from pathlib import Path
-from config import PROJECT_ROOT
+
+import numpy as np
+import pandas as pd
+from loguru import logger
+from tqdm import tqdm
 
 
 def parse_can_data(raw_data_file: Path) -> pd.DataFrame:

@@ -2,15 +2,15 @@ import copy
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
 import numpy as np
 import pynvml
 import torch
 from loguru import logger
+from matplotlib import ticker
 from tqdm import tqdm
 
 
@@ -20,7 +20,7 @@ class GPUMonitor:
             pynvml.nvmlInit()
             self.handle = pynvml.nvmlDeviceGetHandleByIndex(device_idx)
             self.available = True
-        except Exception:
+        except Exception:  # noqa: BLE001
             self.available = False
 
     def get_stats_str(self) -> str:
@@ -48,7 +48,7 @@ def train_model(
     optimizer,
     epochs: int,
     device: torch.device,
-    save_path: Optional[Path] = None,
+    save_path: Path | None = None,
     max_grad_norm: float = 1.0
 ):
 
@@ -212,9 +212,9 @@ def train_model(
 
 
 def plot_training_loss(
-    history: Union[Dict[str, List[float]], List[float]],
+    history: dict[str, list[float]] | list[float],
     save_path: Path,
-    params: Optional[Dict[str, Any]] = None,
+    params: dict[str, Any] | None = None,
 ):
     save_path.parent.mkdir(parents=True, exist_ok=True)
     mpl.rcParams["svg.fonttype"] = "none"

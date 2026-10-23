@@ -1,6 +1,6 @@
 from loguru import logger
 
-from config import RAW_DATA_DIR, PROCESSED_DATA_DIR
+from config import PROCESSED_DATA_DIR, RAW_DATA_DIR
 from src.utils.raw_data_parser import parse_can_data
 
 
