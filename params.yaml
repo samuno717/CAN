@@ -5,6 +5,7 @@ data_split:
 
 # MODEL PARAMS
 model:
+  path: 'ae_lstm_can_model_h64_e500.pth' # just the name of the weights file is enough
   sequence_length: 64
   sequence_step: 5
   hidden_size: 64

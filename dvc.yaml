@@ -27,81 +27,28 @@ stages:
       - data/processed/features/test_scaled.npy
 
 
-  train:
-    cmd: python -m scripts.dvc_stages.train
-    deps:
-      - scripts/dvc_stages/train.py
-      - src/models/ae_lstm.py
-      - src/utils/trainer.py
-      - src/utils/FastTensorDataLoader.py
-      - data/processed/features/train_scaled.npy
-    params:
-      - model.sequence_length
-      - model.sequence_step
-      - model.hidden_size
-      - model.latent_dim
-      - model.num_features
-      - training.seed
-      - training.epochs
-      - training.batch_size
-      - training.learning_rate
-    outs:
-      - src/models/weights/ae_lstm_can_model_h${model.hidden_size}_e${training.epochs}.pth
-      - plots/training_loss_history/train_loss_h${model.hidden_size}_seed${training.seed}.svg
-      - reports/metrics/history_h${model.hidden_size}_seed${training.seed}.json
-
-
-#  train_bottleneck:
-#    matrix:
-#      hidden_size: [32, 64, 128]
-#    cmd: python -m scripts.dvc_stages.train model.hidden_size=${item.hidden_size}
+#  train:
+#    cmd: python -m scripts.dvc_stages.train
 #    deps:
 #      - scripts/dvc_stages/train.py
 #      - src/models/ae_lstm.py
 #      - src/utils/trainer.py
-#      - src/utils/EcuDataset.py
-#      - data/processed/tensors/tensors.npy
+#      - src/utils/FastTensorDataLoader.py
+#      - data/processed/features/train_scaled.npy
 #    params:
-#      - model.hidden_size
 #      - model.sequence_length
+#      - model.sequence_step
+#      - model.hidden_size
+#      - model.latent_dim
 #      - model.num_features
-#      - training.batch_size
+#      - training.seed
 #      - training.epochs
+#      - training.batch_size
 #      - training.learning_rate
 #    outs:
-#      - src/models/weights/ae_lstm_can_model_h${item.hidden_size}_e${training.epochs}.pth
-
-
-
-#  train:
-#    foreach: [ 1, 2, 3, 4, 5 ]
-#    do:
-#      cmd: python -m scripts.dvc_stages.train training.seed=${item}
-#      deps:
-#        - scripts/dvc_stages/train.py
-#        - src/models/ae_lstm.py
-#        - src/utils/trainer.py
-#        - src/utils/EcuDataset.py
-#        - data/processed/tensors/tensors.npy
-#      params:
-#        - model.hidden_size
-#        - model.sequence_length
-#        - model.num_features
-#        - training.batch_size
-#        - training.epochs
-#        - training.learning_rate
-#      outs:
-#        - src/models/weights/ae_lstm_can_model_h${model.hidden_size}_seed_${item}.pth
-#        - reports/metrics/history_h${model.hidden_size}_seed_${item}.json
-
-
-#  compare_seeds:
-#    cmd: python -m scripts.plot_makers.plot_seeds_comparison
-#    deps:
-#      - scripts/plot_makers/plot_seeds_comparison.py
-#      - reports/metrics
-#    outs:
-#      - plots/seeds_convergence_comparison.png
+#      - src/models/weights/ae_lstm_can_model_h${model.hidden_size}_e${training.epochs}.pth
+#      - plots/training_loss_history/train_loss_h${model.hidden_size}_seed${training.seed}.svg
+#      - reports/metrics/history_h${model.hidden_size}_seed${training.seed}.json
 
 
   evaluate:
@@ -112,48 +59,13 @@ stages:
       - data/processed/features/val_scaled.npy
       - src/utils/FastTensorDataLoader.py
       - src/utils/evaluator.py
-      - src/models/weights/ae_lstm_can_model_h${model.hidden_size}_e${training.epochs}.pth
     params:
+      - model.path
       - model.hidden_size
       - model.sequence_length
       - model.num_features
       - training.batch_size
       - detection.percentile
     outs:
-      - reports/metrics/dos_eval_metrics_p${detection.persistence_k}.json
       - plots/reconstruction_error_h${model.hidden_size}_e${training.epochs}.svg
-
-
-  generate_dos:
-    cmd: python -m scripts.dvc_stages.generate_dos
-    deps:
-      - scripts/dvc_stages/generate_dos.py
-      - src/attacks/dos_generator.py
-      - data/processed/tensors/tensors_val.npy
-    params:
-      - attacks.dos.start_row
-      - attacks.dos.duration_rows
-      - attacks.dos.target_id_col
-    outs:
-      - attacks/dos_tensors.npy
-      - attacks/dos_labels.npy
-
-  evaluate_dos:
-    cmd: python -m scripts.dvc_stages.evaluate_dos
-    deps:
-      - scripts/dvc_stages/evaluate_dos.py
-      - src/models/ae_lstm.py
-      - src/utils/EcuDataset.py
-      - src/utils/evaluate_attack.py
-      - attacks/dos_tensors.npy
-      - attacks/dos_labels.npy
       - reports/metrics/threshold.json
-    params:
-      - model.hidden_size
-      - model.sequence_length
-      - model.num_features
-      - training.batch_size
-    outs:
-      - reports/metrics/dos_metrics_h${model.hidden_size}.json
-      - plots/dos_attack_reaction_ir${attacks.dos.injection_ratio}.png
-
