@@ -61,7 +61,7 @@ def main(cfg: DictConfig):
     logger.info(f"Loading validation dataset from {FEATURES_VAL_PATH}...")
     val_numpy = np.load(FEATURES_VAL_PATH)
     val_tensor = torch.from_numpy(val_numpy).float().to(device)
-    val_windows = val_tensor.unfold(0, seq_len, seq_step).permute(0, 2, 1)
+    val_windows = val_tensor.unfold(0, seq_len, seq_step).permute(0, 2, 1).contiguous()
 
     val_loader = FastTensorDataLoader(
         dataset_tensor=val_windows,
