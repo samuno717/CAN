@@ -1,16 +1,21 @@
 import json
+from pathlib import Path
 
+import hydra
 import numpy as np
 import torch
-import hydra
-from omegaconf import DictConfig
-from torch.utils.data import DataLoader
 from loguru import logger
+from omegaconf import DictConfig
 
-from config import PLOTS_DIR, TENSORS_VAL_PATH, WEIGHTS_DIR, REPORTS_DIR
+from config import FEATURES_VAL_PATH, PLOTS_DIR, REPORTS_DIR, WEIGHTS_DIR
 from src.models.ae_lstm import AELSTM
-from src.utils.EcuDataset import EcuDataset
-from src.utils.evaluator import evaluate_model, plot_reconstruction_errors
+from src.utils.evaluator import (
+    evaluate_model,
+    load_sliding_windows,
+    plot_reconstruction_errors,
+)
+from src.utils.FastTensorDataLoader import FastTensorDataLoader
+
 
 @hydra.main(version_base=None, config_path="../..", config_name="params")
 def main(cfg: DictConfig):
@@ -21,36 +26,48 @@ def main(cfg: DictConfig):
     seq_len = cfg.model.sequence_length
     num_features = cfg.model.num_features
 
-    model_path = WEIGHTS_DIR / f"ae_lstm_can_model_h{hidden_size}.pth"
-    plot_path = PLOTS_DIR / f"reconstruction_error_h{hidden_size}.png"
+    model_path = WEIGHTS_DIR / cfg.model.path
+    plot_path = (PLOTS_DIR / f"reconstruction_error_h{hidden_size}_e{cfg.training.epochs}.svg")
 
     if not model_path.exists():
-        raise FileNotFoundError(f"Model weights not found at: {model_path}. Run training first.")
+        raise FileNotFoundError(f"Model weights not found at: {model_path}. Run training first or check the file name.")
 
-    logger.info(f"Loading validation dataset from {TENSORS_VAL_PATH} (window size={seq_len})...")
-    dataset = EcuDataset(data_path=TENSORS_VAL_PATH, sequence_length=seq_len)
-    dataloader = DataLoader(dataset, batch_size=cfg.training.batch_size, shuffle=False)
+    val_windows = load_sliding_windows(file_path=FEATURES_VAL_PATH,
+                                       seq_len=seq_len,
+                                       device=device,
+                                       stride=cfg.model.sequence_step)
 
-    logger.info(f"Loading architecture [features={num_features}, hidden={hidden_size}, seq_len={seq_len}]...")
+    val_loader = FastTensorDataLoader(dataset_tensor=val_windows,
+                                      batch_size=cfg.training.batch_size,
+                                      shuffle=False)
+
+    logger.info(f"Loading model weights from {model_path.name} [hidden={hidden_size}, seq_len={seq_len}]...")
+
     model = AELSTM(
         num_features=num_features,
         hidden_size=hidden_size,
-        sequence_length=seq_len,
+        latent_dim=cfg.model.latent_dim,
+        sequence_length=seq_len
     ).to(device)
-    model.load_state_dict(torch.load(model_path, map_location=device))
+    model.load_state_dict(torch.load(model_path, map_location=device)) # loading saved weights to GPU
 
-    errors = evaluate_model(model=model, dataloader=dataloader, device=device)
+    val_errors = evaluate_model(model=model, dataloader=val_loader, device=device)
+    plot_reconstruction_errors(errors=val_errors, save_path=plot_path, cfg=cfg)
 
-    plot_reconstruction_errors(errors=errors, save_path=plot_path)
+    threshold = float(np.percentile(val_errors, cfg.detection.percentile))
+    logger.success(f"Calibrated threshold (p={cfg.detection.percentile}%): {threshold:.5f}")
 
-    threshold = float(np.percentile(errors, cfg.detection.percentile))
+    logger.warning("Saving baseline threshold...")
     threshold_path = REPORTS_DIR / "metrics" / "threshold.json"
     threshold_path.parent.mkdir(parents=True, exist_ok=True)
-
     with open(threshold_path, "w", encoding="utf-8") as f:
-        json.dump({"threshold": threshold, "percentile": cfg.detection.percentile}, f, indent=4)
-
-    logger.success(f"Calibrated threshold ({threshold:.5f}) saved to: {threshold_path}")
+        json.dump(
+            {
+                "threshold": threshold,
+                "percentile": cfg.detection.percentile,
+            },
+            f, indent=4,
+        )
 
 if __name__ == "__main__":
     main()

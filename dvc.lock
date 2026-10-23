@@ -111,40 +111,37 @@ stages:
       size: 92205696
     - path: scripts/dvc_stages/evaluate.py
       hash: md5
-      md5: b8428a7536b257b4e3e1c81f91e7f43d
-      size: 5508
+      md5: 5b09659e76adb30fc60a988571eba110
+      size: 2702
     - path: src/models/ae_lstm.py
       hash: md5
-      md5: 3c8e37802a0d4ec5fe20dc407047828c
-      size: 2092
-    - path: src/models/weights/ae_lstm_can_model_h64_e400.pth
-      hash: md5
-      md5: ac612400f3ab91f8931772fa242f3ec8
-      size: 247191
+      md5: 07bc074f8ae66f7e63c42cecb1c4f6ad
+      size: 2160
     - path: src/utils/FastTensorDataLoader.py
       hash: md5
       md5: 36e5ceb7c2cd2292f44d74bd22faaccc
       size: 1060
     - path: src/utils/evaluator.py
       hash: md5
-      md5: e5698ba312f75416839447f943a430ee
-      size: 7031
+      md5: 7a87ed6460b0130f1d2b5d5762f02b8e
+      size: 7194
     params:
       params.yaml:
         detection.percentile: 99.9
         model.hidden_size: 64
         model.num_features: 26
+        model.path: ae_lstm_can_model_h64_e500.pth
         model.sequence_length: 64
         training.batch_size: 4096
     outs:
     - path: plots/reconstruction_error_h64_e400.svg
       hash: md5
-      md5: f37f08744eb005ea260e79867b8188eb
-      size: 469726
-    - path: reports/metrics/dos_eval_metrics_p10.json
+      md5: 0443e874c1d18491936431449e501787
+      size: 508748
+    - path: reports/metrics/threshold.json
       hash: md5
-      md5: 65630eee133637b22c1620ea6ac650f0
-      size: 847
+      md5: b4762d289cbb65e4532f809898ff6f08
+      size: 67
   parse_data:
     cmd: python -m scripts.dvc_stages.data_parse
     deps:
@@ -154,12 +151,12 @@ stages:
       size: 269026994
     - path: scripts/dvc_stages/data_parse.py
       hash: md5
-      md5: b1bc2398270b0b41b29582bef1f34e3e
+      md5: dbd14f8307b92440ecae51cc3f76f8c5
       size: 517
     - path: src/utils/raw_data_parser.py
       hash: md5
-      md5: 5046762a54fac29066e3ff5b35e9130f
-      size: 2140
+      md5: bf882d1530446eb0b7c87283ed0277eb
+      size: 2109
     outs:
     - path: data/processed/processed_data.csv
       hash: md5
@@ -578,16 +575,16 @@ stages:
       size: 316159234
     - path: scripts/dvc_stages/preprocess_features.py
       hash: md5
-      md5: b2a20f3c797bbbd62f60932e9757aec6
-      size: 1762
+      md5: 9951c08e7a28fb3c1e0363d18fbf160c
+      size: 1784
     - path: src/utils/feature_prep/preprocess.py
       hash: md5
-      md5: d8d0abf9e5cd6f7cbace27bd7adaeb53
-      size: 1051
+      md5: 1dc838e043a6be93002918de8de8cad5
+      size: 1047
     - path: src/utils/feature_prep/scale_features.py
       hash: md5
-      md5: cb2df66308a00c92ba2e436227955820
-      size: 1037
+      md5: 821862ed717d285ae7c3be211222727c
+      size: 1038
     params:
       params.yaml:
         data_split.train_ratio: 0.7
