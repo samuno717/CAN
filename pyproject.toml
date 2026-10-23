@@ -17,6 +17,7 @@ dependencies = [
     "loguru>=0.7.3",
     "psutil>=7.2.2",
     "nvidia-ml-py>=13.610.43",
+    "ruff>=0.17.2",
 ]
 
 [tool.uv]
