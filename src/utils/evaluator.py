@@ -100,7 +100,7 @@ def plot_reconstruction_errors(errors: np.ndarray, save_path: Path, cfg: DictCon
     fig, (ax_main, ax_hist) = plt.subplots(
         2,
         1,
-        figsize=(30, 10),
+        figsize=(15, 10),
         dpi=300,
         gridspec_kw={"height_ratios": [2.6, 1.0], "hspace": 0.28},
         sharex=False,
