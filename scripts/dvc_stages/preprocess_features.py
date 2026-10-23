@@ -2,11 +2,19 @@ import hydra
 import joblib
 import numpy as np
 import pandas as pd
-from omegaconf import DictConfig
 from loguru import logger
+from omegaconf import DictConfig
 
-from config import (PROCESSED_DATA_DIR, FEATURES_DIR, SCALERS_DIR, TIME_SCALER_PATH, BYTES_SCALER_PATH,
-                    FEATURES_TRAIN_PATH, FEATURES_VAL_PATH, FEATURES_TEST_PATH)
+from config import (
+    BYTES_SCALER_PATH,
+    FEATURES_DIR,
+    FEATURES_TEST_PATH,
+    FEATURES_TRAIN_PATH,
+    FEATURES_VAL_PATH,
+    PROCESSED_DATA_DIR,
+    SCALERS_DIR,
+    TIME_SCALER_PATH,
+)
 from src.utils.feature_prep.preprocess import preprocess_and_split
 from src.utils.feature_prep.scale_features import scale_features
 
@@ -15,7 +23,7 @@ from src.utils.feature_prep.scale_features import scale_features
 def main(cfg: DictConfig):
     logger.info("Loading processed CSV file...")
     df = pd.DataFrame(pd.read_csv(PROCESSED_DATA_DIR / 'processed_data.csv'))
-    logger.success(f"File loaded!")
+    logger.success("File loaded!")
 
     # Preprocessing and split
     df_train, df_val, df_test = preprocess_and_split(df, cfg.data_split.train_ratio, cfg.data_split.val_ratio)
