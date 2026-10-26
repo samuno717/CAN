@@ -1,3 +1,5 @@
+import json
+
 import hydra
 import joblib
 import numpy as np
@@ -7,6 +9,7 @@ from omegaconf import DictConfig
 
 from config import (
     BYTES_SCALER_PATH,
+    FEATURE_COLUMNS_PATH,
     FEATURES_DIR,
     FEATURES_TEST_PATH,
     FEATURES_TRAIN_PATH,
@@ -31,11 +34,13 @@ def main(cfg: DictConfig):
     # Scaling
     df_train, df_val, df_test, bytes_scaler, time_scaler = scale_features(df_train, df_val, df_test)
 
-    # Saving scalers
+    # Saving scalers and canonical feature column order
     SCALERS_DIR.mkdir(parents=True, exist_ok=True)
     joblib.dump(bytes_scaler, BYTES_SCALER_PATH)
     joblib.dump(time_scaler, TIME_SCALER_PATH)
-    logger.info(f"Scalers saved to: {SCALERS_DIR}")
+    with open(FEATURE_COLUMNS_PATH, "w", encoding="utf-8") as f:
+        json.dump(list(df_train.columns), f, indent=2)
+    logger.info(f"Scalers and feature schema saved to: {SCALERS_DIR}")
 
     # Saving 2D matrix
     FEATURES_DIR.mkdir(parents=True, exist_ok=True)
@@ -50,4 +55,3 @@ def main(cfg: DictConfig):
 
 if __name__ == "__main__":
     main()
-
