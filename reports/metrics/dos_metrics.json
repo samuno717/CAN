@@ -1,11 +1,44 @@
 {
-    "threshold": 0.05415,
-    "precision": 0.7101827676240209,
-    "recall": 0.9973333333333333,
-    "f1_score": 0.8296131983917927,
-    "false_positive_rate": 0.0010355707088697775,
-    "true_negatives": 1177839,
-    "false_positives": 1221,
-    "false_negatives": 8,
-    "true_positives": 2992
+    "scenario": "dos",
+    "threshold": 0.04144190119579446,
+    "persistence_k": 10,
+    "total_windows": 887530,
+    "attack_windows": 1063,
+    "benign_windows": 886467,
+    "error_summary": {
+        "benign_mean_mse": 0.01563715748488903,
+        "attack_mean_mse": 0.09542220830917358,
+        "attack_max_mse": 0.17465834319591522
+    },
+    "per_attack": {
+        "dos": {
+            "display_name": "DoS",
+            "attack_windows": 1063,
+            "mean_mse": 0.09542220830917358,
+            "raw_recall": 0.9962370649106302,
+            "persistence_recall": 0.9877704609595485
+        }
+    },
+    "raw": {
+        "threshold": 0.04144190119579446,
+        "precision": 0.5111003861003861,
+        "recall": 0.9962370649106302,
+        "f1_score": 0.675598086124402,
+        "false_positive_rate": 0.0011427385339781403,
+        "true_negatives": 885454,
+        "false_positives": 1013,
+        "false_negatives": 4,
+        "true_positives": 1059
+    },
+    "persistence_filtered": {
+        "threshold": 0.04144190119579446,
+        "precision": 0.948509485094851,
+        "recall": 0.9877704609595485,
+        "f1_score": 0.967741935483871,
+        "false_positive_rate": 6.430019391584797e-05,
+        "true_negatives": 886410,
+        "false_positives": 57,
+        "false_negatives": 13,
+        "true_positives": 1050
+    }
 }

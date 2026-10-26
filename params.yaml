@@ -31,10 +31,36 @@ detection:
   persistence_k: 10
 
 attacks:
+  active_scenario: 'multi' # choose from: multi, dos, replay
+  eval_stride: 1
+
   dos:
     start_row: 5000
-    duration_rows: 300
-    injection_ratio: 1
-    delta_t_val: 0.05
-    payload_val: 1.0        # 0xFF
+    duration_rows: 1000
+    can_id_hex: '002'
+    payload_hex: '0000000000000000'
+    physical_delay: 0.00025
 
+  replay:
+    capture_start_row: 500
+    start_row: 10000
+    duration_rows: 30000
+    target_can_id_hex: 'all'   # 'all' for multi-ECU block replay, or hex ID e.g. '130' for single-ECU replay
+    speed_factor: 1.0
+    min_bus_gap: 0.00020
+
+  multi:
+    steps:
+      - type: 'dos'
+        start_row: 5000
+        duration_rows: 1000
+        can_id_hex: '002'
+        payload_hex: '0000000000000000'
+        physical_delay: 0.00025
+      - type: 'replay'
+        capture_start_row: 500
+        start_row: 11000
+        duration_rows: 1000
+        target_can_id_hex: 'all'
+        speed_factor: 1.0
+        min_bus_gap: 0.00020

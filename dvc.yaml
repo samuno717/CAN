@@ -26,6 +26,7 @@ stages:
     outs:
       - src/models/scalers/bytes_scaler.pkl
       - src/models/scalers/time_scaler.pkl
+      - src/models/scalers/feature_columns.json
       - data/processed/features/train_scaled.npy
       - data/processed/features/val_scaled.npy
       - data/processed/features/test_scaled.npy
@@ -60,17 +61,102 @@ stages:
     deps:
       - scripts/dvc_stages/evaluate.py
       - src/models/ae_lstm.py
+      - src/models/weights/${model.path}
       - data/processed/features/val_scaled.npy
       - src/utils/FastTensorDataLoader.py
       - src/utils/evaluator.py
     params:
       - model.path
       - model.hidden_size
+      - model.latent_dim
       - model.sequence_length
+      - model.sequence_step
       - model.num_features
       - training.batch_size
       - training.epochs
       - detection.percentile
     outs:
-      - plots/reconstruction_error_h${model.hidden_size}_e${training.epochs}.svg
-      - reports/metrics/threshold.json
+      - plots/reconstruction_error_h${model.hidden_size}_e${training.epochs}.svg:
+          cache: false
+      - reports/metrics/threshold.json:
+          cache: false
+
+
+  generate_attack:
+    foreach:
+      - dos
+      - replay
+      - multi
+    do:
+      cmd: python -m scripts.dvc_stages.generate_attack attacks.active_scenario=${item}
+      deps:
+        - scripts/dvc_stages/generate_attack.py
+        - config.py
+        - src/utils/attacks/dos.py
+        - src/utils/attacks/replay.py
+        - data/raw/${parsing.raw_file}
+      params:
+        - parsing.raw_file
+        - preprocessing.train_ratio
+        - preprocessing.val_ratio
+        - attacks.${item}
+      outs:
+        - data/processed/attacks/${item}_attack.log
+        - data/processed/attacks/${item}_labels.npy
+
+
+  preprocess_attack:
+    foreach:
+      - dos
+      - replay
+      - multi
+    do:
+      cmd: python -m scripts.dvc_stages.preprocess_attack attacks.active_scenario=${item}
+      deps:
+        - scripts/dvc_stages/preprocess_attack.py
+        - config.py
+        - src/utils/raw_data_parser.py
+        - src/utils/feature_prep/scale_features.py
+        - data/processed/attacks/${item}_attack.log
+        - data/processed/attacks/${item}_labels.npy
+        - src/models/scalers/bytes_scaler.pkl
+        - src/models/scalers/time_scaler.pkl
+        - src/models/scalers/feature_columns.json
+      outs:
+        - data/processed/attacks/${item}_scaled.npy
+
+
+  evaluate_attack:
+    foreach:
+      - dos
+      - replay
+      - multi
+    do:
+      cmd: python -m scripts.dvc_stages.evaluate_attack attacks.active_scenario=${item}
+      deps:
+        - scripts/dvc_stages/evaluate_attack.py
+        - src/utils/evaluate_attack.py
+        - config.py
+        - src/utils/evaluator.py
+        - src/utils/FastTensorDataLoader.py
+        - src/models/ae_lstm.py
+        - src/models/weights/${model.path}
+        - reports/metrics/threshold.json
+        - data/processed/attacks/${item}_scaled.npy
+        - data/processed/attacks/${item}_labels.npy
+      params:
+        - model.path
+        - model.hidden_size
+        - model.latent_dim
+        - model.sequence_length
+        - model.num_features
+        - training.batch_size
+        - training.epochs
+        - detection.persistence_k
+        - attacks.eval_stride
+      outs:
+        - plots/${item}_attack_reaction_h${model.hidden_size}_e${training.epochs}.svg:
+            cache: false
+      metrics:
+        - reports/metrics/${item}_metrics.json:
+            cache: false
