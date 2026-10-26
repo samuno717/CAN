@@ -4,9 +4,12 @@ stages:
     deps:
       - scripts/dvc_stages/data_parse.py
       - src/utils/raw_data_parser.py
-      - data/raw/candump-2026-04-28_162402.log
+      - data/raw/${parsing.raw_file}
+    params:
+      - parsing.raw_file
+      - parsing.output_file
     outs:
-      - data/processed/processed_data.csv
+      - data/processed/${parsing.output_file}
 
 
   preprocess_features:
@@ -15,10 +18,11 @@ stages:
       - scripts/dvc_stages/preprocess_features.py
       - src/utils/feature_prep/preprocess.py
       - src/utils/feature_prep/scale_features.py
-      - data/processed/processed_data.csv
+      - data/processed/${preprocessing.processed_file}
     params:
-      - data_split.train_ratio
-      - data_split.val_ratio
+      - preprocessing.processed_file
+      - preprocessing.train_ratio
+      - preprocessing.val_ratio
     outs:
       - src/models/scalers/bytes_scaler.pkl
       - src/models/scalers/time_scaler.pkl
@@ -65,6 +69,7 @@ stages:
       - model.sequence_length
       - model.num_features
       - training.batch_size
+      - training.epochs
       - detection.percentile
     outs:
       - plots/reconstruction_error_h${model.hidden_size}_e${training.epochs}.svg

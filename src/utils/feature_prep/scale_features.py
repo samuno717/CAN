@@ -7,7 +7,7 @@ from sklearn.preprocessing import MinMaxScaler
 def scale_features(df_train: pd.DataFrame, df_val: pd.DataFrame, df_test: pd.DataFrame) -> tuple[
     DataFrame, DataFrame, DataFrame, MinMaxScaler, MinMaxScaler]:
 
-    logger.info("Feature scaling: Fit on train, transform on train and test...")
+    logger.info("Feature scaling...")
 
     byte_columns = [f'byte{i}' for i in range(1, 9)]
 

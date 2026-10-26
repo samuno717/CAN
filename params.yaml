@@ -1,11 +1,18 @@
-# STAGE 2: prepare_tensors
-data_split:
+# When it comes to pointing a file, just its name is enough
+
+# STAGE 1: data_parse
+parsing:
+  raw_file: 'candump-2026-04-28_162402.log'
+  output_file: 'processed_data.csv'
+
+# STAGE 2: preprocess_features
+preprocessing:
+  processed_file: 'processed_data.csv'
   train_ratio: 0.70
   val_ratio: 0.15
 
-# MODEL PARAMS
 model:
-  path: 'ae_lstm_can_model_h64_e500.pth' # just the name of the weights file is enough
+  path: 'ae_lstm_can_model_h64_e500.pth'
   sequence_length: 64
   sequence_step: 5
   hidden_size: 64
@@ -27,7 +34,6 @@ attacks:
   dos:
     start_row: 5000
     duration_rows: 300
-    target_id_col: 9
     injection_ratio: 1
     delta_t_val: 0.05
     payload_val: 1.0        # 0xFF

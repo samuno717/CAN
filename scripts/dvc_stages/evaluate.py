@@ -12,7 +12,7 @@ from src.models.ae_lstm import AELSTM
 from src.utils.evaluator import (
     evaluate_model,
     load_sliding_windows,
-    plot_reconstruction_errors,
+    plot_reconstruction_errors
 )
 from src.utils.FastTensorDataLoader import FastTensorDataLoader
 
@@ -57,7 +57,7 @@ def main(cfg: DictConfig):
     threshold = float(np.percentile(val_errors, cfg.detection.percentile))
     logger.success(f"Calibrated threshold (p={cfg.detection.percentile}%): {threshold:.5f}")
 
-    logger.warning("Saving baseline threshold...")
+    logger.info("Saving baseline threshold...")
     threshold_path = REPORTS_DIR / "metrics" / "threshold.json"
     threshold_path.parent.mkdir(parents=True, exist_ok=True)
     with open(threshold_path, "w", encoding="utf-8") as f:

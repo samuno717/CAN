@@ -1,12 +1,15 @@
+import hydra
 from loguru import logger
+from omegaconf import DictConfig
 
 from config import PROCESSED_DATA_DIR, RAW_DATA_DIR
 from src.utils.raw_data_parser import parse_can_data
 
 
-def main():
-    raw_datafile = RAW_DATA_DIR / 'candump-2026-04-28_162402.log'
-    output_path = PROCESSED_DATA_DIR / 'processed_data.csv'
+@hydra.main(version_base=None, config_path="../..", config_name="params")
+def main(cfg: DictConfig):
+    raw_datafile = RAW_DATA_DIR / cfg.parsing.raw_file
+    output_path = PROCESSED_DATA_DIR / cfg.parsing.output_file
 
     parsed_data = parse_can_data(raw_datafile)
 

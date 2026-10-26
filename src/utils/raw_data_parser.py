@@ -14,7 +14,7 @@ def parse_can_data(raw_data_file: Path) -> pd.DataFrame:
     first_log_timestamp = None
     final_log_timestamp = None
     ids = set()
-
+    logger.info(f"Parsing file: {raw_data_file}")
     with open(raw_data_file, 'r', encoding='utf-8') as logfile, \
             tqdm(total=datafile_size, desc="Processing frames", unit="B", unit_scale=True, unit_divisor=1024) as pbar:
 

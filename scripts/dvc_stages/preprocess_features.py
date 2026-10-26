@@ -22,11 +22,11 @@ from src.utils.feature_prep.scale_features import scale_features
 @hydra.main(version_base=None, config_path="../..", config_name="params")
 def main(cfg: DictConfig):
     logger.info("Loading processed CSV file...")
-    df = pd.DataFrame(pd.read_csv(PROCESSED_DATA_DIR / 'processed_data.csv'))
+    df = pd.DataFrame(pd.read_csv(PROCESSED_DATA_DIR / cfg.preprocessing.processed_file))
     logger.success("File loaded!")
 
     # Preprocessing and split
-    df_train, df_val, df_test = preprocess_and_split(df, cfg.data_split.train_ratio, cfg.data_split.val_ratio)
+    df_train, df_val, df_test = preprocess_and_split(df, cfg.preprocessing.train_ratio, cfg.preprocessing.val_ratio)
 
     # Scaling
     df_train, df_val, df_test, bytes_scaler, time_scaler = scale_features(df_train, df_val, df_test)

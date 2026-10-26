@@ -111,8 +111,8 @@ stages:
       size: 92205696
     - path: scripts/dvc_stages/evaluate.py
       hash: md5
-      md5: 5b09659e76adb30fc60a988571eba110
-      size: 2702
+      md5: 4c6ae603b92be38234e61119a28efbef
+      size: 2697
     - path: src/models/ae_lstm.py
       hash: md5
       md5: 07bc074f8ae66f7e63c42cecb1c4f6ad
@@ -123,7 +123,7 @@ stages:
       size: 1060
     - path: src/utils/evaluator.py
       hash: md5
-      md5: 7a87ed6460b0130f1d2b5d5762f02b8e
+      md5: e46b5f6a4638c9eefc5ec5a2374cd2a5
       size: 7194
     params:
       params.yaml:
@@ -133,11 +133,12 @@ stages:
         model.path: ae_lstm_can_model_h64_e500.pth
         model.sequence_length: 64
         training.batch_size: 4096
+        training.epochs: 400
     outs:
     - path: plots/reconstruction_error_h64_e400.svg
       hash: md5
-      md5: 0443e874c1d18491936431449e501787
-      size: 508748
+      md5: 1059181bf44d48079bcc0572633f8296
+      size: 439641
     - path: reports/metrics/threshold.json
       hash: md5
       md5: b4762d289cbb65e4532f809898ff6f08
@@ -151,12 +152,16 @@ stages:
       size: 269026994
     - path: scripts/dvc_stages/data_parse.py
       hash: md5
-      md5: dbd14f8307b92440ecae51cc3f76f8c5
-      size: 517
+      md5: 0c7e9a0b2352adacc8db8b29c46978fb
+      size: 644
     - path: src/utils/raw_data_parser.py
       hash: md5
-      md5: bf882d1530446eb0b7c87283ed0277eb
-      size: 2109
+      md5: dea1abb1506162e038febc22fa6d20c2
+      size: 2158
+    params:
+      params.yaml:
+        parsing.output_file: processed_data.csv
+        parsing.raw_file: candump-2026-04-28_162402.log
     outs:
     - path: data/processed/processed_data.csv
       hash: md5
@@ -575,20 +580,21 @@ stages:
       size: 316159234
     - path: scripts/dvc_stages/preprocess_features.py
       hash: md5
-      md5: 9951c08e7a28fb3c1e0363d18fbf160c
-      size: 1784
+      md5: d5140601dddf979e8f99937b7df23bc7
+      size: 1802
     - path: src/utils/feature_prep/preprocess.py
       hash: md5
       md5: 1dc838e043a6be93002918de8de8cad5
       size: 1047
     - path: src/utils/feature_prep/scale_features.py
       hash: md5
-      md5: 821862ed717d285ae7c3be211222727c
-      size: 1038
+      md5: 38f6cc1c349c105f626c0b5e911c3e16
+      size: 995
     params:
       params.yaml:
-        data_split.train_ratio: 0.7
-        data_split.val_ratio: 0.15
+        preprocessing.processed_file: processed_data.csv
+        preprocessing.train_ratio: 0.7
+        preprocessing.val_ratio: 0.15
     outs:
     - path: data/processed/features/test_scaled.npy
       hash: md5
