@@ -82,18 +82,68 @@ stages:
           cache: false
 
 
+  train_iforest:
+    cmd: python -m scripts.dvc_stages.train_iforest
+    deps:
+      - scripts/dvc_stages/train_iforest.py
+      - src/models/isolation_forest.py
+      - data/processed/features/train_scaled.npy
+    params:
+      - model.sequence_length
+      - model.sequence_step
+      - training.seed
+      - iforest.path
+      - iforest.n_estimators
+      - iforest.max_samples
+      - iforest.contamination
+      - iforest.max_features
+      - iforest.feature_mode
+    outs:
+      - src/models/weights/${iforest.path}
+
+
+  evaluate_iforest:
+    cmd: python -m scripts.dvc_stages.evaluate_iforest
+    deps:
+      - scripts/dvc_stages/evaluate_iforest.py
+      - src/models/isolation_forest.py
+      - src/models/weights/${iforest.path}
+      - data/processed/features/val_scaled.npy
+    params:
+      - model.sequence_length
+      - model.sequence_step
+      - detection.percentile
+      - iforest.path
+      - iforest.n_estimators
+      - iforest.feature_mode
+    outs:
+      - plots/iforest_validation_score_n${iforest.n_estimators}.svg:
+          cache: false
+      - reports/metrics/iforest_threshold.json:
+          cache: false
+
+
   generate_attack:
     foreach:
       - dos
       - replay
+      - payload
+      - frequency
+      - fuzzing
+      - suspension
       - multi
     do:
       cmd: python -m scripts.dvc_stages.generate_attack attacks.active_scenario=${item}
       deps:
         - scripts/dvc_stages/generate_attack.py
         - config.py
+        - src/utils/attacks/common.py
         - src/utils/attacks/dos.py
         - src/utils/attacks/replay.py
+        - src/utils/attacks/payload.py
+        - src/utils/attacks/frequency.py
+        - src/utils/attacks/fuzzing.py
+        - src/utils/attacks/suspension.py
         - data/raw/${parsing.raw_file}
       params:
         - parsing.raw_file
@@ -109,6 +159,10 @@ stages:
     foreach:
       - dos
       - replay
+      - payload
+      - frequency
+      - fuzzing
+      - suspension
       - multi
     do:
       cmd: python -m scripts.dvc_stages.preprocess_attack attacks.active_scenario=${item}
@@ -130,6 +184,10 @@ stages:
     foreach:
       - dos
       - replay
+      - payload
+      - frequency
+      - fuzzing
+      - suspension
       - multi
     do:
       cmd: python -m scripts.dvc_stages.evaluate_attack attacks.active_scenario=${item}
@@ -160,3 +218,67 @@ stages:
       metrics:
         - reports/metrics/${item}_metrics.json:
             cache: false
+
+
+  evaluate_attack_iforest:
+    foreach:
+      - dos
+      - replay
+      - payload
+      - frequency
+      - fuzzing
+      - suspension
+      - multi
+    do:
+      cmd: python -m scripts.dvc_stages.evaluate_attack_iforest attacks.active_scenario=${item}
+      deps:
+        - scripts/dvc_stages/evaluate_attack_iforest.py
+        - src/models/isolation_forest.py
+        - src/utils/evaluate_attack.py
+        - config.py
+        - src/models/weights/${iforest.path}
+        - reports/metrics/iforest_threshold.json
+        - data/processed/attacks/${item}_scaled.npy
+        - data/processed/attacks/${item}_labels.npy
+      params:
+        - model.sequence_length
+        - detection.persistence_k
+        - attacks.eval_stride
+        - iforest.path
+        - iforest.n_estimators
+        - iforest.feature_mode
+      outs:
+        - plots/iforest_${item}_attack_reaction_n${iforest.n_estimators}.svg:
+            cache: false
+      metrics:
+        - reports/metrics/iforest_${item}_metrics.json:
+            cache: false
+
+
+  compare_models:
+    cmd: python -m scripts.dvc_stages.compare_models
+    deps:
+      - scripts/dvc_stages/compare_models.py
+      - config.py
+      - reports/metrics/dos_metrics.json
+      - reports/metrics/replay_metrics.json
+      - reports/metrics/payload_metrics.json
+      - reports/metrics/frequency_metrics.json
+      - reports/metrics/fuzzing_metrics.json
+      - reports/metrics/suspension_metrics.json
+      - reports/metrics/multi_metrics.json
+      - reports/metrics/iforest_dos_metrics.json
+      - reports/metrics/iforest_replay_metrics.json
+      - reports/metrics/iforest_payload_metrics.json
+      - reports/metrics/iforest_frequency_metrics.json
+      - reports/metrics/iforest_fuzzing_metrics.json
+      - reports/metrics/iforest_suspension_metrics.json
+      - reports/metrics/iforest_multi_metrics.json
+    params:
+      - detection.persistence_k
+    outs:
+      - plots/model_comparison_ae_lstm_vs_iforest.svg:
+          cache: false
+    metrics:
+      - reports/metrics/model_comparison.json:
+          cache: false

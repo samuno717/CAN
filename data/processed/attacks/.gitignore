@@ -7,3 +7,15 @@
 /multi_labels.npy
 /replay_scaled.npy
 /multi_scaled.npy
+/payload_attack.log
+/payload_labels.npy
+/frequency_attack.log
+/frequency_labels.npy
+/fuzzing_attack.log
+/fuzzing_labels.npy
+/suspension_attack.log
+/suspension_labels.npy
+/payload_scaled.npy
+/frequency_scaled.npy
+/fuzzing_scaled.npy
+/suspension_scaled.npy
