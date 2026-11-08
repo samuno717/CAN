@@ -11,9 +11,25 @@ from src.utils.evaluator import apply_persistence_filter, calculate_metrics
 
 
 def align_window_labels(labels: np.ndarray, sequence_length: int = 64, stride: int = 1) -> np.ndarray:
-    """Assigns an attack label to a window if any frame inside the window is an attack."""
+    """Assigns the dominant non-zero attack label to each window (or 0 if all frames are normal)."""
     windows = sliding_window_view(labels, window_shape=sequence_length)[::stride]
-    return windows.max(axis=1).astype(np.int8)
+    has_attack = np.any(windows > 0, axis=1)
+    result = np.zeros(len(windows), dtype=np.int8)
+
+    if not np.any(has_attack):
+        return result
+
+    attack_windows = windows[has_attack]
+    unique_attack_ids = [int(c) for c in np.unique(attack_windows) if c > 0]
+
+    if len(unique_attack_ids) == 1:
+        result[has_attack] = np.int8(unique_attack_ids[0])
+        return result
+
+    counts = np.stack([(attack_windows == cid).sum(axis=1) for cid in unique_attack_ids], axis=1)
+    dominant_idx = np.argmax(counts, axis=1)
+    result[has_attack] = np.array(unique_attack_ids, dtype=np.int8)[dominant_idx]
+    return result
 
 
 def compute_detection_metrics(
@@ -48,7 +64,7 @@ def compute_detection_metrics(
             "persistence_recall": pers_recall,
         }
         logger.info(
-            f"  -> [{name}] windows={total:,} | raw_recall={raw_recall:.4f} | persist_recall={pers_recall:.4f}"
+            f"  -> [{name:<10}] windows={total:>7,} | raw_recall={raw_recall:.4f} | persist_recall={pers_recall:.4f}"
         )
 
     logger.success(
@@ -171,7 +187,7 @@ def plot_attack_evaluation(
             zorder=5,
         )
 
-    ax_zoom.set_title(f"IDS Response — {scenario_title} (Zoomed)", fontsize=13, fontweight="bold")
+    ax_zoom.set_title(f"IDS Response \u2014 {scenario_title} (Zoomed)", fontsize=13, fontweight="bold")
     ax_zoom.set_xlabel("Sliding Window Index")
     ax_zoom.set_ylabel("Mean Squared Error (MSE)")
     ax_zoom.set_xlim(z_start, z_end)
@@ -212,26 +228,26 @@ def plot_attack_evaluation(
         per_atk_text = ""
         for info in metrics.get("per_attack", {}).values():
             per_atk_text += (
-                f"  • {info['display_name']:<9}: "
+                f"  \u2022 {info['display_name']:<10}: "
                 f"{info['raw_recall'] * 100:>5.1f}% / {info['persistence_recall'] * 100:>5.1f}%\n"
             )
 
         info_text = (
             "Detection Summary:\n"
-            f"  • Threshold       : {threshold:>9.5f}\n"
-            f"  • Attack windows  : {metrics['attack_windows']:>9,}\n"
-            f"  • Benign mean MSE : {err_s['benign_mean_mse']:>9.5f}\n"
-            f"  • Attack mean MSE : {err_s['attack_mean_mse']:>9.5f}\n\n"
+            f"  \u2022 Threshold       : {threshold:>9.5f}\n"
+            f"  \u2022 Attack windows  : {metrics['attack_windows']:>9,}\n"
+            f"  \u2022 Benign mean MSE : {err_s['benign_mean_mse']:>9.5f}\n"
+            f"  \u2022 Attack mean MSE : {err_s['attack_mean_mse']:>9.5f}\n\n"
             "Per-Attack Recall (Raw / Persist):\n"
             f"{per_atk_text}\n"
             "Global Raw:\n"
-            f"  • Precision       : {raw_m['precision']:>9.4f}\n"
-            f"  • Recall          : {raw_m['recall']:>9.4f}\n"
-            f"  • F1-Score        : {raw_m['f1_score']:>9.4f}\n\n"
+            f"  \u2022 Precision       : {raw_m['precision']:>9.4f}\n"
+            f"  \u2022 Recall          : {raw_m['recall']:>9.4f}\n"
+            f"  \u2022 F1-Score        : {raw_m['f1_score']:>9.4f}\n\n"
             f"Global Persistence (k={persistence_k}):\n"
-            f"  • Precision       : {pers_m['precision']:>9.4f}\n"
-            f"  • Recall          : {pers_m['recall']:>9.4f}\n"
-            f"  • F1-Score        : {pers_m['f1_score']:>9.4f}"
+            f"  \u2022 Precision       : {pers_m['precision']:>9.4f}\n"
+            f"  \u2022 Recall          : {pers_m['recall']:>9.4f}\n"
+            f"  \u2022 F1-Score        : {pers_m['f1_score']:>9.4f}"
         )
 
         fig.canvas.draw()

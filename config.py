@@ -26,16 +26,28 @@ METRICS_DIR = REPORTS_DIR / "metrics"
 PLOTS_DIR = PROJECT_ROOT / "plots"
 NOTEBOOKS_DIR = PROJECT_ROOT / "notebooks"
 
-# Attack label IDs (0 = normal frame, 1 = DoS, 2 = Replay)
+# Attack label IDs (0 = normal, 1 = DoS, 2 = Replay, 3 = Masquerade/Payload, 4 = Frequency, 5 = Fuzzing, 6 = Suspension)
 DOS_LABEL = 1
 REPLAY_LABEL = 2
+PAYLOAD_LABEL = 3
+FREQUENCY_LABEL = 4
+FUZZING_LABEL = 5
+SUSPENSION_LABEL = 6
 
 ATTACK_NAMES = {
     DOS_LABEL: "DoS",
     REPLAY_LABEL: "Replay",
+    PAYLOAD_LABEL: "Payload",
+    FREQUENCY_LABEL: "Frequency",
+    FUZZING_LABEL: "Fuzzing",
+    SUSPENSION_LABEL: "Suspension",
 }
 
 ATTACK_COLORS = {
     DOS_LABEL: "#C0392B",
     REPLAY_LABEL: "#7C3AED",
+    PAYLOAD_LABEL: "#059669",
+    FREQUENCY_LABEL: "#0284C7",
+    FUZZING_LABEL: "#DB2777",
+    SUSPENSION_LABEL: "#EA580C",
 }
