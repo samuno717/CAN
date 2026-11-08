@@ -1,5 +1,6 @@
-import pandas as pd
 import matplotlib.pyplot as plt
+import pandas as pd
+
 from config import DATA_DIR, PLOTS_DIR
 
 csv_file_path = DATA_DIR / 'processed' / 'processed_data.csv'

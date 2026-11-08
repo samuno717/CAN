@@ -1,160 +1,260 @@
 import json
 from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 from loguru import logger
-from sklearn.metrics import confusion_matrix
-import torch
-from tqdm import tqdm
+from numpy.lib.stride_tricks import sliding_window_view
+
+from config import ATTACK_COLORS, ATTACK_NAMES
+from src.utils.evaluator import apply_persistence_filter, calculate_metrics
 
 
-def evaluate_attack_stream(model: torch.nn.Module, dataloader, device: torch.device) -> np.ndarray:
-    """Computes mean squared reconstruction error across all sliding windows."""
-    logger.info("Computing reconstruction MSE across all sliding windows...")
-    model.eval()
-    errors = []
-
-    with torch.no_grad():
-        for batch in tqdm(dataloader, desc="Inference on attacked stream", unit="batch"):
-            batch = batch.to(device)
-            reconstruction = model(batch)
-            loss_per_window = torch.mean((reconstruction - batch) ** 2, dim=(1, 2))
-            errors.extend(loss_per_window.cpu().numpy())
-
-    return np.array(errors, dtype=np.float32)
-
-
-def align_window_labels(labels: np.ndarray, sequence_length: int = 64) -> np.ndarray:
-    """
-    Aligns raw frame-level labels with sliding windows.
-    A window is marked as an anomaly (1) if its closing frame is an attack frame.
-    """
-    logger.info(f"Aligning frame labels with sequence length: {sequence_length}...")
-    return labels[sequence_length - 1 :]
+def align_window_labels(labels: np.ndarray, sequence_length: int = 64, stride: int = 1) -> np.ndarray:
+    """Assigns an attack label to a window if any frame inside the window is an attack."""
+    windows = sliding_window_view(labels, window_shape=sequence_length)[::stride]
+    return windows.max(axis=1).astype(np.int8)
 
 
 def compute_detection_metrics(
     errors: np.ndarray,
-    y_true: np.ndarray,
+    y_true_cls: np.ndarray,
     threshold: float,
-    metrics_save_path: str | Path | None = None,
+    persistence_k: int = 10,
+    scenario_name: str = "attack",
+    metrics_save_path: Path | None = None,
 ) -> dict:
-    """Evaluates classification performance and optionally dumps report to JSON."""
-    if len(errors) != len(y_true):
-        raise ValueError(
-            f"Shape mismatch: {len(errors)} error scores vs {len(y_true)} target labels."
+    """Computes global and per-attack detection metrics and saves them to JSON."""
+    y_true_bin = (y_true_cls > 0).astype(np.int8)
+    y_pred_raw = (errors > threshold).astype(np.int8)
+    y_pred_pers = apply_persistence_filter(y_pred_raw, k=persistence_k)
+
+    raw_stats = calculate_metrics(y_true_bin, y_pred_raw, threshold)
+    pers_stats = calculate_metrics(y_true_bin, y_pred_pers, threshold)
+
+    per_attack = {}
+    for cid in [int(c) for c in np.unique(y_true_cls) if c > 0]:
+        name = ATTACK_NAMES.get(cid, f"Attack #{cid}")
+        mask = y_true_cls == cid
+        total = int(np.sum(mask))
+        raw_recall = float(np.mean(y_pred_raw[mask])) if total > 0 else 0.0
+        pers_recall = float(np.mean(y_pred_pers[mask])) if total > 0 else 0.0
+
+        per_attack[name.lower()] = {
+            "display_name": name,
+            "attack_windows": total,
+            "mean_mse": float(np.mean(errors[mask])),
+            "raw_recall": raw_recall,
+            "persistence_recall": pers_recall,
+        }
+        logger.info(
+            f"  -> [{name}] windows={total:,} | raw_recall={raw_recall:.4f} | persist_recall={pers_recall:.4f}"
         )
 
-    logger.info(f"Evaluating classification performance at threshold: {threshold:.5f}")
-    y_pred = (errors > threshold).astype(np.int8)
+    logger.success(
+        f"[RAW]         Precision: {raw_stats['precision']:.4f} | "
+        f"Recall: {raw_stats['recall']:.4f} | F1: {raw_stats['f1_score']:.4f}"
+    )
+    logger.success(
+        f"[PERSIST k={persistence_k}] Precision: {pers_stats['precision']:.4f} | "
+        f"Recall: {pers_stats['recall']:.4f} | F1: {pers_stats['f1_score']:.4f}"
+    )
 
-    # Force 2x2 matrix shape via labels=[0, 1] to prevent unpacking failure
-    cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
-    tn, fp, fn, tp = cm.ravel()
-
-    precision = float(tp / (tp + fp)) if (tp + fp) > 0 else 0.0
-    recall = float(tp / (tp + fn)) if (tp + fn) > 0 else 0.0
-    f1 = float(2 * (precision * recall) / (precision + recall)) if (precision + recall) > 0 else 0.0
-    fpr = float(fp / (fp + tn)) if (fp + tn) > 0 else 0.0
-
-    logger.info(f"Confusion Matrix: [TN: {tn}, FP: {fp}, FN: {fn}, TP: {tp}]")
-    logger.success(f"Precision: {precision:.4f} | Recall: {recall:.4f} | F1-Score: {f1:.4f} | FPR: {fpr:.4f}")
-
+    benign_mask = y_true_bin == 0
+    attack_mask = y_true_bin == 1
     metrics = {
+        "scenario": scenario_name,
         "threshold": float(threshold),
-        "precision": precision,
-        "recall": recall,
-        "f1_score": f1,
-        "false_positive_rate": fpr,
-        "true_negatives": int(tn),
-        "false_positives": int(fp),
-        "false_negatives": int(fn),
-        "true_positives": int(tp),
+        "persistence_k": int(persistence_k),
+        "total_windows": len(errors),
+        "attack_windows": int(np.sum(attack_mask)),
+        "benign_windows": int(np.sum(benign_mask)),
+        "error_summary": {
+            "benign_mean_mse": float(np.mean(errors[benign_mask])) if np.any(benign_mask) else 0.0,
+            "attack_mean_mse": float(np.mean(errors[attack_mask])) if np.any(attack_mask) else 0.0,
+            "attack_max_mse": float(np.max(errors[attack_mask])) if np.any(attack_mask) else 0.0,
+        },
+        "per_attack": per_attack,
+        "raw": raw_stats,
+        "persistence_filtered": pers_stats,
     }
 
     if metrics_save_path:
-        metrics_path = Path(metrics_save_path)
-        metrics_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(metrics_path, "w", encoding="utf-8") as f:
+        metrics_save_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(metrics_save_path, "w", encoding="utf-8") as f:
             json.dump(metrics, f, indent=4)
-        logger.success(f"Metrics artifact exported to: {metrics_path}")
+        logger.success(f"Metrics saved to: {metrics_save_path}")
 
     return metrics
 
 
+def _shade_regions(
+    ax,
+    x_indices: np.ndarray,
+    color: str,
+    label: str,
+    ymin: float = 0.0,
+    ymax: float = 1.0,
+    alpha: float = 0.23,
+    zorder: int | None = None,
+) -> None:
+    if len(x_indices) == 0:
+        return
+    splits = np.where(np.diff(x_indices) > 1)[0] + 1
+    for i, region in enumerate(np.split(x_indices, splits)):
+        ax.axvspan(
+            region[0],
+            region[-1],
+            ymin=ymin,
+            ymax=ymax,
+            color=color,
+            alpha=alpha,
+            zorder=zorder,
+            label=label if i == 0 else "",
+        )
+
+
 def plot_attack_evaluation(
     errors: np.ndarray,
-    y_true: np.ndarray,
+    y_true_cls: np.ndarray,
     threshold: float,
-    save_path: str | Path,
-    attack_name: str = "Denial of Service (DoS)",
-    display_limit: int = 12000,
-):
-    """Plots reconstruction MSE, decision threshold, and ground-truth attack regions."""
-    logger.info(f"Generating diagnostic plot for {attack_name}...")
+    save_path: Path,
+    persistence_k: int = 10,
+    metrics: dict | None = None,
+    scenario_title: str = "Attack Evaluation",
+) -> None:
+    """Plots zoomed view around injected attacks (top) and full test stream overview (bottom)."""
+    y_pred_pers = apply_persistence_filter((errors > threshold).astype(np.int8), k=persistence_k)
+    attack_ids = [int(c) for c in np.unique(y_true_cls) if c > 0]
 
-    limit = min(display_limit, len(errors))
-    errors_sub = errors[:limit]
-    labels_sub = y_true[:limit]
+    # Zoom bounds covering all attacks with a 2000-window margin
+    atk_idx = np.where(y_true_cls > 0)[0]
+    z_start = max(0, int(atk_idx[0]) - 2000) if len(atk_idx) > 0 else 0
+    z_end = min(len(errors), int(atk_idx[-1]) + 2000) if len(atk_idx) > 0 else min(10000, len(errors))
 
-    fig, ax = plt.subplots(figsize=(18, 7), dpi=300)
-
-    # 1. Reconstruction MSE Curve
-    ax.plot(
-        errors_sub,
-        color="#1C3D5A",
-        alpha=0.85,
-        linewidth=1.2,
-        label="Reconstruction MSE (Window)",
+    fig, (ax_zoom, ax_full) = plt.subplots(
+        2, 1, figsize=(16, 10), dpi=300, gridspec_kw={"height_ratios": [1.8, 1.0], "hspace": 0.32}
     )
 
-    # 2. Decision Threshold
-    ax.axhline(
-        y=threshold,
-        color="#E74C3C",
-        linestyle="--",
-        linewidth=1.8,
-        label=f"Decision Threshold ({threshold:.5f})",
+    # 1. Top panel: Zoomed attack zone
+    x_zoom = np.arange(z_start, z_end)
+    err_zoom = errors[z_start:z_end]
+    cls_zoom = y_true_cls[z_start:z_end]
+    pers_zoom = y_pred_pers[z_start:z_end]
+
+    ax_zoom.plot(x_zoom, err_zoom, color="#1C3D5A", linewidth=1.1, zorder=3, label="Reconstruction MSE")
+    ax_zoom.axhline(
+        threshold, color="#E74C3C", linestyle="--", linewidth=1.5, zorder=4, label=f"Threshold ({threshold:.5f})"
     )
 
-    # 3. Ground Truth Attack Shading
-    attack_indices = np.where(labels_sub == 1)[0]
-    if len(attack_indices) > 0:
-        diffs = np.diff(attack_indices)
-        split_points = np.where(diffs > 1)[0] + 1
-        attack_ranges = np.split(attack_indices, split_points)
+    # Reserve top 12% of the axis for the alarm status bar so it never touches the MSE curve
+    max_y = max(float(np.max(err_zoom)), threshold)
+    ax_zoom.set_ylim(bottom=0.0, top=max_y * 1.16)
 
-        for i, r in enumerate(attack_ranges):
-            ax.axvspan(
-                r[0],
-                r[-1],
-                color="#C0392B",
-                alpha=0.22,
-                label="Ground Truth Attack Zone" if i == 0 else "",
+    for cid in attack_ids:
+        name = ATTACK_NAMES.get(cid, f"Attack #{cid}")
+        color = ATTACK_COLORS.get(cid, "#D97706")
+        _shade_regions(ax_zoom, x_zoom[cls_zoom == cid], color, f"Ground-Truth: {name}", ymax=0.93)
+
+    # Top status bar strip (ymin=0.94..0.99) showing active persistence-filtered alarm
+    ax_zoom.axhline(max_y * 1.16 * 0.935, color="#CBD5E1", linestyle=":", linewidth=0.9, zorder=2)
+    alarms = x_zoom[pers_zoom == 1]
+    if len(alarms) > 0:
+        _shade_regions(
+            ax_zoom,
+            alarms,
+            color="#D97706",
+            label=f"Active Alarm Bar (k={persistence_k})",
+            ymin=0.94,
+            ymax=0.99,
+            alpha=0.92,
+            zorder=5,
+        )
+
+    ax_zoom.set_title(f"IDS Response — {scenario_title} (Zoomed)", fontsize=13, fontweight="bold")
+    ax_zoom.set_xlabel("Sliding Window Index")
+    ax_zoom.set_ylabel("Mean Squared Error (MSE)")
+    ax_zoom.set_xlim(z_start, z_end)
+    ax_zoom.grid(True, linestyle="--", alpha=0.5)
+
+    leg = ax_zoom.legend(bbox_to_anchor=(1.015, 1.0), loc="upper left", borderaxespad=0.0, framealpha=0.95)
+
+    # 2. Bottom panel: Downsampled full test stream
+    n_bins = min(2000, len(errors))
+    edges = np.linspace(0, len(errors), n_bins + 1, dtype=int)
+    centers = 0.5 * (edges[:-1] + edges[1:])
+    bin_max = [np.max(errors[edges[i] : edges[i + 1]]) for i in range(n_bins)]
+    bin_mean = [np.mean(errors[edges[i] : edges[i + 1]]) for i in range(n_bins)]
+
+    ax_full.plot(centers, bin_max, color="#64748B", alpha=0.55, linewidth=0.9, label="Peak MSE (Full Stream)")
+    ax_full.plot(centers, bin_mean, color="#1E3A8A", linewidth=1.2, label="Mean MSE (Full Stream)")
+    ax_full.axhline(threshold, color="#E74C3C", linestyle="--", linewidth=1.4, label="Threshold")
+
+    for cid in attack_ids:
+        name = ATTACK_NAMES.get(cid, f"Attack #{cid}")
+        color = ATTACK_COLORS.get(cid, "#D97706")
+        first_idx = int(np.where(y_true_cls == cid)[0][0])
+        ax_full.axvline(first_idx, color=color, linestyle=":", linewidth=1.6, label=f"Injected {name}")
+
+    ax_full.set_title(f"Full Test Stream Overview (N = {len(errors):,} Windows)", fontsize=11, fontweight="bold")
+    ax_full.set_xlabel("Sliding Window Index")
+    ax_full.set_ylabel("MSE")
+    ax_full.set_xlim(0, len(errors))
+    ax_full.grid(True, linestyle=":", alpha=0.5)
+    ax_full.legend(loc="upper right", framealpha=0.92, fontsize=8.8)
+
+    # Summary box on the right
+    if metrics is not None:
+        raw_m = metrics["raw"]
+        pers_m = metrics["persistence_filtered"]
+        err_s = metrics["error_summary"]
+
+        per_atk_text = ""
+        for info in metrics.get("per_attack", {}).values():
+            per_atk_text += (
+                f"  • {info['display_name']:<9}: "
+                f"{info['raw_recall'] * 100:>5.1f}% / {info['persistence_recall'] * 100:>5.1f}%\n"
             )
 
-    ax.set_title(
-        f"Intrusion Detection System Response — {attack_name}",
-        fontsize=14,
-        fontweight="bold",
-        pad=12,
-    )
-    ax.set_xlabel("Time Window Index", fontsize=11)
-    ax.set_ylabel("Mean Squared Error (MSE)", fontsize=11)
-    ax.grid(True, which="both", linestyle="--", linewidth=0.5, alpha=0.6)
-    ax.set_xlim(0, limit)
+        info_text = (
+            "Detection Summary:\n"
+            f"  • Threshold       : {threshold:>9.5f}\n"
+            f"  • Attack windows  : {metrics['attack_windows']:>9,}\n"
+            f"  • Benign mean MSE : {err_s['benign_mean_mse']:>9.5f}\n"
+            f"  • Attack mean MSE : {err_s['attack_mean_mse']:>9.5f}\n\n"
+            "Per-Attack Recall (Raw / Persist):\n"
+            f"{per_atk_text}\n"
+            "Global Raw:\n"
+            f"  • Precision       : {raw_m['precision']:>9.4f}\n"
+            f"  • Recall          : {raw_m['recall']:>9.4f}\n"
+            f"  • F1-Score        : {raw_m['f1_score']:>9.4f}\n\n"
+            f"Global Persistence (k={persistence_k}):\n"
+            f"  • Precision       : {pers_m['precision']:>9.4f}\n"
+            f"  • Recall          : {pers_m['recall']:>9.4f}\n"
+            f"  • F1-Score        : {pers_m['f1_score']:>9.4f}"
+        )
 
-    ax.legend(
-        bbox_to_anchor=(1.01, 1),
-        loc="upper left",
-        borderaxespad=0.0,
-        framealpha=0.95,
-        fontsize=10,
-    )
+        fig.canvas.draw()
+        renderer = fig.canvas.get_renderer()
+        leg_bbox = leg.get_window_extent(renderer).transformed(ax_zoom.transAxes.inverted())
 
-    save_path = Path(save_path)
+        ax_zoom.text(
+            1.015,
+            leg_bbox.ymin - 0.04,
+            info_text,
+            transform=ax_zoom.transAxes,
+            fontsize=8.6,
+            fontfamily="monospace",
+            verticalalignment="top",
+            bbox={
+                "boxstyle": "round,pad=0.6,rounding_size=0.2",
+                "facecolor": "#FFFFFF",
+                "edgecolor": "#CBD5E1",
+                "alpha": 0.95,
+            },
+        )
+
     save_path.parent.mkdir(parents=True, exist_ok=True)
-    # bbox_inches='tight' safely encompasses external legends without requiring tight_layout()
-    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+    plt.savefig(save_path, dpi=300, bbox_inches="tight", pad_inches=0.3)
     plt.close(fig)
-    logger.success(f"Attack reaction plot saved to: {save_path}")
+    logger.success(f"Plot saved to: {save_path}")

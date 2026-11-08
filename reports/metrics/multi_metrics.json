@@ -1,0 +1,51 @@
+{
+    "scenario": "multi",
+    "threshold": 0.04144190119579446,
+    "persistence_k": 10,
+    "total_windows": 888530,
+    "attack_windows": 3129,
+    "benign_windows": 885401,
+    "error_summary": {
+        "benign_mean_mse": 0.01563580147922039,
+        "attack_mean_mse": 0.08656363189220428,
+        "attack_max_mse": 0.17466138303279877
+    },
+    "per_attack": {
+        "dos": {
+            "display_name": "DoS",
+            "attack_windows": 1063,
+            "mean_mse": 0.09542223811149597,
+            "raw_recall": 0.9962370649106302,
+            "persistence_recall": 0.9877704609595485
+        },
+        "replay": {
+            "display_name": "Replay",
+            "attack_windows": 2066,
+            "mean_mse": 0.08200569450855255,
+            "raw_recall": 0.9888673765730881,
+            "persistence_recall": 0.9845111326234269
+        }
+    },
+    "raw": {
+        "threshold": 0.04144190119579446,
+        "precision": 0.7541940189642596,
+        "recall": 0.9913710450623202,
+        "f1_score": 0.8566694283347142,
+        "false_positive_rate": 0.001141855498243169,
+        "true_negatives": 884390,
+        "false_positives": 1011,
+        "false_negatives": 27,
+        "true_positives": 3102
+    },
+    "persistence_filtered": {
+        "threshold": 0.04144190119579446,
+        "precision": 0.9818529130850048,
+        "recall": 0.9856184084372004,
+        "f1_score": 0.983732057416268,
+        "false_positive_rate": 6.437760969323504e-05,
+        "true_negatives": 885344,
+        "false_positives": 57,
+        "false_negatives": 45,
+        "true_positives": 3084
+    }
+}

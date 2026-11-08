@@ -1,17 +1,23 @@
-from datetime import datetime
+import json
 import random
+
 import hydra
 import numpy as np
 import torch
-import torch.nn as nn
-import json
 from loguru import logger
 from omegaconf import DictConfig
+from torch import nn
 
-from config import FEATURES_TRAIN_PATH, FEATURES_VAL_PATH, WEIGHTS_DIR, METRICS_DIR, PLOTS_DIR
+from config import (
+    FEATURES_TRAIN_PATH,
+    FEATURES_VAL_PATH,
+    METRICS_DIR,
+    PLOTS_DIR,
+    WEIGHTS_DIR,
+)
 from src.models.ae_lstm import AELSTM
 from src.utils.FastTensorDataLoader import FastTensorDataLoader
-from src.utils.trainer import train_model, plot_training_loss
+from src.utils.trainer import plot_training_loss, train_model
 
 
 def set_seed(seed: int = 42):
@@ -55,7 +61,7 @@ def main(cfg: DictConfig):
     logger.info(f"Loading validation dataset from {FEATURES_VAL_PATH}...")
     val_numpy = np.load(FEATURES_VAL_PATH)
     val_tensor = torch.from_numpy(val_numpy).float().to(device)
-    val_windows = val_tensor.unfold(0, seq_len, seq_step).permute(0, 2, 1)
+    val_windows = val_tensor.unfold(0, seq_len, seq_step).permute(0, 2, 1).contiguous()
 
     val_loader = FastTensorDataLoader(
         dataset_tensor=val_windows,
@@ -86,7 +92,6 @@ def main(cfg: DictConfig):
         save_path=model_path,
     )
 
-    timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
     history_path = (METRICS_DIR / f"history_h{cfg.model.hidden_size}_seed{seed}.json")
     history_path.parent.mkdir(parents=True, exist_ok=True)
     with open(history_path, "w", encoding="utf-8") as f:
