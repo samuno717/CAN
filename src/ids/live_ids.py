@@ -603,7 +603,7 @@ class LiveCANIDSService:
                         _flush()
                         new_frames_since_flush = 0
                         new_unknown_since_flush = 0
-                        last_flush_ts = now
+                        last_flush_ts = time.perf_counter()
                     # Experiment mode: stop automatically once the replayed stream has finished
                     if (
                         self.idle_exit_s > 0
@@ -639,7 +639,9 @@ class LiveCANIDSService:
                     _flush()
                     new_frames_since_flush = 0
                     new_unknown_since_flush = 0
-                    last_flush_ts = now
+                    # Measured AFTER inference: with 'now' (taken before the flush) a flush slower than
+                    # flush_interval made every following frame trigger a new flush with a batch of 1 window
+                    last_flush_ts = time.perf_counter()
 
             # Final flush on shutdown
             if pending_windows or new_frames_since_flush > 0:
