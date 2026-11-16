@@ -53,6 +53,17 @@ if [[ "${BUILD}" == "1" ]]; then
     docker compose build can-ids can-player
 fi
 
+if [[ "${MODE}" == "socketcan" ]]; then
+    # The kernel silently caps SO_RCVBUF at net.core.rmem_max; a too small buffer drops frames during DoS bursts
+    IDS_RCVBUF="${IDS_RCVBUF:-16777216}"
+    RMEM_MAX="$(cat /proc/sys/net/core/rmem_max 2>/dev/null || echo 0)"
+    if (( RMEM_MAX < IDS_RCVBUF )); then
+        log "ERROR: net.core.rmem_max=${RMEM_MAX} < IDS_RCVBUF=${IDS_RCVBUF} - run: sudo sysctl -w net.core.rmem_max=${IDS_RCVBUF}"
+        exit 1
+    fi
+    export IDS_RCVBUF
+fi
+
 if [[ "${MODE}" == "socketcan" && "${CAN_IFACE}" == vcan* ]]; then
     if ! ip link show "${CAN_IFACE}" >/dev/null 2>&1; then
         bash docker/can-player/setup_vcan_host.sh "${CAN_IFACE}"

@@ -52,11 +52,13 @@ services:
       IDS_STRIDE: ${IDS_STRIDE:-5}
       # Consecutive anomalous windows required to trigger confirmed alarm
       PERSISTENCE_K: ${PERSISTENCE_K:-10}
-      # Micro-batch size & flush interval (ms) optimized for Raspberry Pi 5 CPU
-      IDS_BATCH_SIZE: ${IDS_BATCH_SIZE:-32}
+      # Micro-batch size & flush interval (ms). In real time a batch is closed after IDS_FLUSH_MS, so 256 is
+      # only reached when the IDS falls behind (e.g. DoS bursts); measured on RPi5 (AE-LSTM, stride 1):
+      # batch 256 + 4 threads ~2,090 windows/s vs ~1,500 frames/s on the replayed bus
+      IDS_BATCH_SIZE: ${IDS_BATCH_SIZE:-256}
       IDS_FLUSH_MS: ${IDS_FLUSH_MS:-50}
-      # PyTorch CPU threads on Raspberry Pi 5 (2 threads avoids spin-lock contention on 4-core Cortex-A76)
-      TORCH_THREADS: ${TORCH_THREADS:-2}
+      # PyTorch CPU threads (all 4 Cortex-A76 cores of the Raspberry Pi 5)
+      TORCH_THREADS: ${TORCH_THREADS:-4}
       # Prometheus exporter port
       METRICS_PORT: ${METRICS_PORT:-8000}
       # --- Experiment recording (see scripts/online/README.md) ---
@@ -69,8 +71,10 @@ services:
       # File source only: '0' = process frames as fast as possible (throughput benchmark)
       IDS_PACING: ${IDS_PACING:-1}
       SPEED: ${SPEED:-1}
-      # Requested SocketCAN receive buffer in bytes (0 = kernel default; capped by net.core.rmem_max)
-      IDS_RCVBUF: ${IDS_RCVBUF:-0}
+      # Requested SocketCAN receive buffer in bytes (0 = kernel default ~208 KB; capped by net.core.rmem_max).
+      # 16 MB absorbs DoS bursts without kernel drops - requires on the host:
+      #   sudo sysctl -w net.core.rmem_max=16777216
+      IDS_RCVBUF: ${IDS_RCVBUF:-16777216}
       # Optional override of model files from params.yaml (file names in src/models/weights)
       AE_WEIGHTS: ${AE_WEIGHTS:-}
       IFOREST_WEIGHTS: ${IFOREST_WEIGHTS:-}
