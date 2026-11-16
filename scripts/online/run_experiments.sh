@@ -20,6 +20,8 @@
 # =====================================================================================
 set -euo pipefail
 cd "$(dirname "$0")/../.."
+# Every "docker compose run" below gets stdin from /dev/null: with the terminal attached as stdin
+# it can keep running after the container has exited and the script never continues.
 
 MODELS="${MODELS:-ae_lstm iforest}"
 SCENARIOS="${SCENARIOS:-raw dos replay payload frequency fuzzing suspension multi}"
@@ -79,11 +81,11 @@ run_one() {
 
     if [[ "${MODE}" == "file" ]]; then
         IDS_SOURCE=file IDS_PACING="${IDS_PACING}" timeout "${MAX_RUN_SEC}" \
-            docker compose run -T --rm --no-deps can-ids > "${LOG_DIR}/${RUN_ID}.ids.log" 2>&1 || log "WARN: IDS exited with error"
+            docker compose run -T --rm --no-deps can-ids < /dev/null > "${LOG_DIR}/${RUN_ID}.ids.log" 2>&1 || log "WARN: IDS exited with error"
     else
         IDS_SOURCE=socketcan docker compose up -d --no-deps --force-recreate can-ids
         wait_for_ids
-        timeout "${MAX_RUN_SEC}" docker compose run -T --rm --no-deps can-player > "${LOG_DIR}/${RUN_ID}.player.log" 2>&1 \
+        timeout "${MAX_RUN_SEC}" docker compose run -T --rm --no-deps can-player < /dev/null > "${LOG_DIR}/${RUN_ID}.player.log" 2>&1 \
             || log "WARN: can-player exited with error (see ${LOG_DIR}/${RUN_ID}.player.log)"
         # The IDS stops by itself IDLE_EXIT_SEC after the last frame (and writes summary.json)
         if ! timeout $((IDLE_EXIT_SEC + 180)) docker wait can-bus-ids >/dev/null; then
@@ -96,7 +98,7 @@ run_one() {
     if [[ "${WITH_MONITORING}" == "1" ]]; then
         sleep 3   # let Prometheus finish the last scrape window
         docker compose run -T --rm --no-deps --entrypoint python can-ids \
-            scripts/online/export_prometheus.py --run-dir "reports/online/${RUN_ID}" || log "WARN: Prometheus export failed"
+            scripts/online/export_prometheus.py --run-dir "reports/online/${RUN_ID}" < /dev/null || log "WARN: Prometheus export failed"
     fi
 
     log "<<< ${RUN_ID} done, cooling down ${COOLDOWN_SEC}s"
@@ -123,7 +125,7 @@ done
 
 if [[ "${EVALUATE}" == "1" ]]; then
     log "Evaluating new runs..."
-    docker compose run -T --rm --no-deps --entrypoint python can-ids -m scripts.online.evaluate_online --all \
+    docker compose run -T --rm --no-deps --entrypoint python can-ids -m scripts.online.evaluate_online --all < /dev/null \
         | tee "${LOG_DIR}/evaluate_$(date +%Y%m%d-%H%M%S).txt"
 fi
 log "All experiments finished. Copy reports/online/ to the PC and run: uv run python -m scripts.online.aggregate_online"
