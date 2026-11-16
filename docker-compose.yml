@@ -1,0 +1,130 @@
+services:
+  # 1. SocketCAN Traffic & Attack Stream Generator
+  can-player:
+    build:
+      context: .
+      dockerfile: docker/can-player/Dockerfile
+    container_name: can-stream-player
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      # Choose scenario: raw | dos | replay | payload | frequency | fuzzing | suspension | multi
+      SCENARIO: ${SCENARIO:-multi}
+      # Target SocketCAN interface on Raspberry Pi 5 (vcan0 for virtual, can0 for physical HAT)
+      CAN_IFACE: ${CAN_IFACE:-vcan0}
+      # Source interface name inside candump log files
+      LOG_IFACE: ${LOG_IFACE:-can0}
+      # Number of loops ('1' for full pass of test dataset, 'i' for continuous infinite stream)
+      LOOPS: ${LOOPS:-1}
+      # Frame limit (0 = play entire 15% test split without truncation)
+      MAX_FRAMES: ${MAX_FRAMES:-0}
+      # Wait a few seconds on startup so can-ids is already listening before frames are transmitted
+      START_DELAY_SEC: ${START_DELAY_SEC:-3}
+      # Set to '1' to print every transmitted frame to container logs
+      VERBOSE: ${VERBOSE:-0}
+      # Replay speed factor (1 = real time, 2 = twice as fast ...) - used for IDS stress tests
+      SPEED: ${SPEED:-1}
+    volumes:
+      - ./data:/workspace/data:ro
+      - /lib/modules:/lib/modules:ro
+    depends_on:
+      - can-ids
+
+  # 2. Real-Time CAN Bus Intrusion Detection System (AE-LSTM or Isolation Forest)
+  can-ids:
+    build:
+      context: .
+      dockerfile: docker/can-ids/Dockerfile
+    container_name: can-bus-ids
+    network_mode: host
+    environment:
+      # Choose model: ae_lstm | iforest
+      MODEL_TYPE: ${MODEL_TYPE:-ae_lstm}
+      # SocketCAN interface to sniff (vcan0 or can0)
+      CAN_IFACE: ${CAN_IFACE:-vcan0}
+      # Frame ingestion source: 'socketcan' (default on Linux/RPi5) or 'file' (direct log replay)
+      IDS_SOURCE: ${IDS_SOURCE:-socketcan}
+      SCENARIO: ${SCENARIO:-multi}
+      LOOPS: ${LOOPS:-1}
+      # Sliding window step in frames (default 5 matches params.yaml sequence_step and keeps RPi5 CPU low)
+      IDS_STRIDE: ${IDS_STRIDE:-5}
+      # Consecutive anomalous windows required to trigger confirmed alarm
+      PERSISTENCE_K: ${PERSISTENCE_K:-10}
+      # Micro-batch size & flush interval (ms) optimized for Raspberry Pi 5 CPU
+      IDS_BATCH_SIZE: ${IDS_BATCH_SIZE:-32}
+      IDS_FLUSH_MS: ${IDS_FLUSH_MS:-50}
+      # PyTorch CPU threads on Raspberry Pi 5 (2 threads avoids spin-lock contention on 4-core Cortex-A76)
+      TORCH_THREADS: ${TORCH_THREADS:-2}
+      # Prometheus exporter port
+      METRICS_PORT: ${METRICS_PORT:-8000}
+      # --- Experiment recording (see scripts/online/README.md) ---
+      # '1' = write per-window scores, timings and system metrics to reports/online/<RUN_ID>
+      RECORD_RUN: ${RECORD_RUN:-0}
+      RUN_ID: ${RUN_ID:-}
+      RUN_TAG: ${RUN_TAG:-}
+      # Stop the IDS N seconds after the replayed stream ends (0 = run forever)
+      IDLE_EXIT_SEC: ${IDLE_EXIT_SEC:-0}
+      # File source only: '0' = process frames as fast as possible (throughput benchmark)
+      IDS_PACING: ${IDS_PACING:-1}
+      SPEED: ${SPEED:-1}
+      # Requested SocketCAN receive buffer in bytes (0 = kernel default; capped by net.core.rmem_max)
+      IDS_RCVBUF: ${IDS_RCVBUF:-0}
+      # Optional override of model files from params.yaml (file names in src/models/weights)
+      AE_WEIGHTS: ${AE_WEIGHTS:-}
+      IFOREST_WEIGHTS: ${IFOREST_WEIGHTS:-}
+    volumes:
+      - ./data:/workspace/data:ro
+      - ./reports:/workspace/reports
+      # Evaluation scripts can be run inside this image on the Pi (docker compose run --entrypoint python ...)
+      - ./scripts:/workspace/scripts:ro
+
+  # 3. Prometheus Time-Series Telemetry Server (scrapes can-ids every 1s)
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    container_name: can-ids-prometheus
+    network_mode: host
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=7d"
+      - "--web.enable-lifecycle"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    depends_on:
+      - can-ids
+
+  # 4. Grafana Live Visualization Dashboard (http://localhost:3000)
+  grafana:
+    image: grafana/grafana:11.2.2
+    container_name: can-ids-grafana
+    network_mode: host
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/provisioning/dashboards/json/can_ids_dashboard.json
+      GF_USERS_DEFAULT_THEME: dark
+    volumes:
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+  # Optional diagnostic listener: run with `docker compose --profile monitor up`
+  can-monitor:
+    build:
+      context: .
+      dockerfile: docker/can-player/Dockerfile
+    container_name: can-stream-monitor
+    network_mode: host
+    profiles:
+      - monitor
+    entrypoint: ["candump", "-tz", "${CAN_IFACE:-vcan0}"]
+
+volumes:
+  prometheus_data:
+  grafana_data:

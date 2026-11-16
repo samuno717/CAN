@@ -1,0 +1,14 @@
+# Ignore everything except what the containers need at build time
+*
+!config.py
+!params.yaml
+!docker/
+!docker/**
+!src/
+!src/**
+!reports/
+!reports/metrics/
+!reports/metrics/threshold.json
+!reports/metrics/iforest_threshold.json
+__pycache__/
+*.pyc
