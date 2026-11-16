@@ -1,8 +1,8 @@
- # CAN Bus Anomaly Detection (AE-LSTM vs Isolation Forest)
+# CAN Bus Anomaly Detection & Real-Time IDS (AE-LSTM vs Isolation Forest)
 
-Unsupervised Intrusion Detection System (IDS) for Controller Area Network (CAN) traffic. 
+Unsupervised Intrusion Detection System (IDS) for Controller Area Network (CAN) traffic, designed and benchmarked for **Raspberry Pi 5 (8 GB)** on Linux (`SocketCAN`).
 
-The main goal of this project is to detect anomalies and attacks on the CAN bus without relying on labeled attack data during training. The models are trained strictly on normal driving traffic (`candump` logs) and evaluated against several synthetic attack scenarios injected into the test split.
+The main goal of this project is to detect anomalies and attacks on the CAN bus without relying on labeled attack data during training. The models are trained strictly on normal driving traffic (`candump` logs) and evaluated against synthetic attack scenarios injected into the test split, as well as in a **live streaming Docker + Prometheus + Grafana IDS stack**.
 
 I built this pipeline to compare a sequence-aware deep learning approach (**LSTM Autoencoder**) against a classical baseline (**Isolation Forest**) under identical windowing and thresholding conditions.
 
@@ -14,7 +14,7 @@ I built this pipeline to compare a sequence-aware deep learning approach (**LSTM
 Raw SocketCAN logs (`data/raw/candump-*.log`) are parsed into structured CSVs and split chronologically into **70% train / 15% validation / 15% test** (no shuffling, to avoid data leakage across time windows).
 
 Each CAN frame is converted into a **26-dimensional feature vector**:
-- `delta_t` – time elapsed since the previous frame on the bus (MinMax scaled)
+- `delta_t` – time elapsed since the previous frame of the same ECU ID on the bus (MinMax scaled)
 - `byte1` .. `byte8` – 8 payload bytes converted from hex to `0–255` (MinMax scaled)
 - 17 one-hot encoded columns for the 17 distinct ECU arbitration IDs present in the traffic
 
@@ -67,12 +67,57 @@ Metrics below come from `reports/metrics/model_comparison.json`:
 
 ---
 
+## Real-Time CAN IDS (Docker + Prometheus + Grafana on Raspberry Pi 5)
+
+The repository includes a complete real-time Intrusion Detection System (`src/ids/`) and a 4-container Docker Compose stack optimized for Linux / Raspberry Pi 5 (`vcan0` / `can0`):
+
+1. **`can-player`** – replays any chosen scenario (`raw`, `dos`, `replay`, `payload`, `frequency`, `fuzzing`, `suspension`, `multi`) onto a SocketCAN interface (`vcan0` or `can0`) using `canplayer`.
+2. **`can-ids`** – sniffs raw SocketCAN frames, performs O(1) stateful feature scaling (`StreamingFeatureExtractor`), evaluates 64-frame sliding windows in micro-batches using either **AE-LSTM** or **Isolation Forest** (`IDSDetector`), applies the `k=10` persistence filter, logs confirmed incidents to `reports/live_alerts.jsonl`, and exposes Prometheus metrics on `:8000/metrics`.
+3. **`prometheus`** – scrapes `can-ids` telemetry every `1s` on `:9090`.
+4. **`grafana`** – serves a pre-provisioned live dashboard (`CAN Bus Real-Time IDS`) on `http://localhost:3000` (anonymous access enabled, default login `admin` / `admin`).
+
+### Launching the Live IDS Stack on Linux / Raspberry Pi 5
+
+```bash
+# 1. Run with AE-LSTM (default) and the combined 'multi' attack scenario
+MODEL_TYPE=ae_lstm SCENARIO=multi docker compose up --build
+
+# 2. Run with Isolation Forest for side-by-side comparison
+MODEL_TYPE=iforest SCENARIO=multi docker compose up --build
+
+# 3. Test a specific attack scenario (e.g. dos, replay, payload, frequency, fuzzing, suspension, raw)
+MODEL_TYPE=ae_lstm SCENARIO=dos docker compose up
+
+# 4. Adjust sliding window stride (e.g. IDS_STRIDE=5) or target physical CAN HAT (CAN_IFACE=can0)
+MODEL_TYPE=ae_lstm SCENARIO=fuzzing IDS_STRIDE=5 CAN_IFACE=vcan0 docker compose up
+```
+
+Or using `Makefile` shortcuts:
+```bash
+make ids-ae SCENARIO=multi
+make ids-iforest SCENARIO=multi
+```
+
+Open **`http://localhost:3000`** (or `http://<raspberry-pi-ip>:3000`) to view the live Grafana dashboard:
+- **Security Status Banner:** turns from green (`SECURE (NORMAL TRAFFIC)`) to red (`INTRUSION DETECTED!`) when $k=10$ consecutive windows exceed the calibrated threshold.
+- **Real-Time Anomaly Score vs 99.9% Threshold:** live curve of window MSE / IForest score, micro-batch peak, and 50-window rolling mean.
+- **Diagnostic Feature Breakdown:** real-time separation of Timing Error (`delta_t`), Payload Error (`byte1..byte8`), and Arbitration ID Error (`can_id_*`).
+- **Raspberry Pi 5 Benchmark Panels:** live per-window inference latency (`ms`), bus frame rate (`frames/s`), window throughput (`windows/s`), and CPU / RAM usage for comparing `AE-LSTM` vs `Isolation Forest`.
+
+---
+
 ## Project Structure
 
 ```text
 ├── config.py                  # Paths and attack label definitions
 ├── params.yaml                # Hydra / DVC hyperparameters & attack configs
 ├── dvc.yaml                   # Full DVC pipeline definition
+├── docker-compose.yml         # Full Real-Time IDS stack (can-player, can-ids, Prometheus, Grafana)
+├── docker/
+│   ├── can-player/            # SocketCAN traffic generator container
+│   ├── can-ids/               # Real-Time IDS Python container (ARM64 / x86_64)
+│   ├── prometheus/            # Prometheus 1s scrape configuration
+│   └── grafana/               # Auto-provisioned datasource & CAN IDS dashboard JSON
 ├── data/
 │   ├── raw/                   # Raw SocketCAN (.log) dumps
 │   └── processed/             # Parsed CSVs, scaled .npy splits, generated attacks
@@ -83,15 +128,16 @@ Metrics below come from `reports/metrics/model_comparison.json`:
 │   ├── dvc_stages/            # Entrypoints for each DVC pipeline stage
 │   └── plot_makers/           # Standalone scripts for extra plots (entropy, seeds, etc.)
 └── src/
+    ├── ids/                   # Real-time streaming feature extractor, detector & Prometheus exporter
     ├── models/                # AELSTM, CANIsolationForest, saved weights & scalers
     └── utils/                 # Log parser, feature scaling, attack generators, trainer/evaluator
 ```
 
 ---
 
-## Setup & Usage
+## Offline DVC Pipeline Setup & Usage
 
-This project uses [uv](https://github.com/astral-sh/uv) for dependency management and **DVC** + **Hydra** for running the pipeline. Note that `pyproject.toml` is configured for Windows with CUDA 12.8 (`pytorch-cu128`).
+This project uses [uv](https://github.com/astral-sh/uv) for dependency management and **DVC** + **Hydra** for running the offline training/evaluation pipeline.
 
 ### 1. Install dependencies
 ```powershell
@@ -103,15 +149,11 @@ uv sync
 ```
 
 ### 2. Run the full pipeline with DVC
-All stages (parsing, feature scaling, evaluation, attack generation, and model comparison) are tracked in `dvc.yaml`. To reproduce everything:
 ```powershell
 uv run dvc repro
 ```
-*(Note: the `train` stage for AE-LSTM is commented out in `dvc.yaml` by default so `dvc repro` uses the pre-trained weights in `src/models/weights/` instead of retraining for 400 epochs every time. Uncomment it if you want to train from scratch.)*
 
 ### 3. Run individual stages or tweak parameters
-Every script in `scripts/dvc_stages/` uses Hydra and reads from `params.yaml`. You can run them directly or override parameters from the CLI:
-
 ```powershell
 # Train AE-LSTM for a quick 1-epoch smoke test
 uv run python -m scripts.dvc_stages.train training.epochs=1

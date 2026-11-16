@@ -62,27 +62,32 @@ stages:
       hash: md5
       md5: aa33c177cbb04c6f3281a5ca7d3116e7
       size: 430292848
+    - path: data/processed/features/val_scaled.npy
+      hash: md5
+      md5: 10568ff893c01ef3d94d3d9f1666cb6e
+      size: 92205696
     - path: scripts/dvc_stages/train.py
       hash: md5
-      md5: 985b760d9c27e906a571e041fc687180
-      size: 3868
+      md5: 774b83dd9ef95ff1298f63374def3b14
+      size: 3870
     - path: src/models/ae_lstm.py
       hash: md5
-      md5: 3c8e37802a0d4ec5fe20dc407047828c
-      size: 2092
+      md5: 07bc074f8ae66f7e63c42cecb1c4f6ad
+      size: 2160
     - path: src/utils/FastTensorDataLoader.py
       hash: md5
       md5: 36e5ceb7c2cd2292f44d74bd22faaccc
       size: 1060
     - path: src/utils/trainer.py
       hash: md5
-      md5: adccabfe585d0ee298ddef172d85e587
-      size: 11670
+      md5: 8e8eb5637c31336b300150311894fb6a
+      size: 11640
     params:
       params.yaml:
         model.hidden_size: 64
         model.latent_dim: 16
         model.num_features: 26
+        model.path: ae_lstm_can_model_h64_e400.pth
         model.sequence_length: 64
         model.sequence_step: 5
         training.batch_size: 4096
@@ -92,7 +97,7 @@ stages:
     outs:
     - path: plots/training_loss_history/train_loss_h64_seed42.svg
       hash: md5
-      md5: 602dd3cdd02a200d8f07eda82b6086b7
+      md5: 9ded0aa4cbdd0399a6ee8d2c33490e66
       size: 44119
     - path: reports/metrics/history_h64_seed42.json
       hash: md5
@@ -111,15 +116,15 @@ stages:
       size: 92205696
     - path: scripts/dvc_stages/evaluate.py
       hash: md5
-      md5: 28d4ee90d12105b733bdb39620e3d022
-      size: 2814
+      md5: 94d811d12493f1bd3754b1739e828726
+      size: 2872
     - path: src/models/ae_lstm.py
       hash: md5
       md5: 07bc074f8ae66f7e63c42cecb1c4f6ad
       size: 2160
-    - path: src/models/weights/ae_lstm_can_model_h64_e500.pth
+    - path: src/models/weights/ae_lstm_can_model_h64_e400.pth
       hash: md5
-      md5: 9f5759ecfe3a39999be682215611afca
+      md5: ac612400f3ab91f8931772fa242f3ec8
       size: 247191
     - path: src/utils/FastTensorDataLoader.py
       hash: md5
@@ -127,27 +132,27 @@ stages:
       size: 1060
     - path: src/utils/evaluator.py
       hash: md5
-      md5: e46b5f6a4638c9eefc5ec5a2374cd2a5
-      size: 7194
+      md5: 8e298d72720fd57eb26cc31ddc56a704
+      size: 5778
     params:
       params.yaml:
+        attacks.eval_stride: 1
         detection.percentile: 99.9
         model.hidden_size: 64
         model.latent_dim: 16
         model.num_features: 26
-        model.path: ae_lstm_can_model_h64_e500.pth
+        model.path: ae_lstm_can_model_h64_e400.pth
         model.sequence_length: 64
-        model.sequence_step: 5
         training.batch_size: 4096
         training.epochs: 400
     outs:
     - path: plots/reconstruction_error_h64_e400.svg
       hash: md5
-      md5: 938fd01c6f22a981c05c707822e8ffb3
-      size: 440173
+      md5: 2aac5b283aa36bc42e88e17ea4bcdae6
+      size: 404960
     - path: reports/metrics/threshold.json
       hash: md5
-      md5: 03ee185044a10677717ea224db878faa
+      md5: d880af498fcbae1bf94d96ca5ac004c8
       size: 67
   parse_data:
     cmd: python -m scripts.dvc_stages.data_parse
@@ -701,41 +706,41 @@ stages:
       size: 269026994
     - path: scripts/dvc_stages/generate_attack.py
       hash: md5
-      md5: cb71186405623a4644f9e1e357442a32
-      size: 5608
+      md5: b32203958049c07247255b63d8f1f41f
+      size: 5765
     - path: src/utils/attacks/common.py
       hash: md5
-      md5: e8399754d391d80c9689d7fb823375cd
-      size: 2390
+      md5: f218de3eb553fced9f8f76da89ef429c
+      size: 2273
     - path: src/utils/attacks/dos.py
       hash: md5
-      md5: 6acc33c2fbf557807ad187d5e3c33276
-      size: 1623
+      md5: 40475d839aabdca2d4b278191283f9f5
+      size: 1646
     - path: src/utils/attacks/frequency.py
       hash: md5
-      md5: 55366dade9c3a7c47bac2804e7a76c49
-      size: 1966
+      md5: 39a10222745ac3454740f916999e430f
+      size: 1852
     - path: src/utils/attacks/fuzzing.py
       hash: md5
-      md5: 28032cdfa5041711777aca453a7ef496
-      size: 2235
+      md5: 62319a3a54205d94f013e5d37b4357d3
+      size: 2132
     - path: src/utils/attacks/payload.py
       hash: md5
-      md5: eff737fc7fa77b0cddbec08c69e3bb3d
-      size: 3104
+      md5: 8bcffa1264cae40ce811a83c851442f1
+      size: 2956
     - path: src/utils/attacks/replay.py
       hash: md5
-      md5: 26c2de718af0754d64e6ccd61b9a9e0b
-      size: 1575
+      md5: 41bf47daaebb05974a09122d6fc701a1
+      size: 1482
     - path: src/utils/attacks/suspension.py
       hash: md5
-      md5: a0bebaabe2997cc1f837e4729bbb1f7e
-      size: 1643
+      md5: 90b198d269d8b2528960b509fa4d39d8
+      size: 1336
     params:
       params.yaml:
         attacks.dos:
-          start_row: 5000
-          duration_rows: 1000
+          start_row: 10000
+          duration_rows: 10000
           can_id_hex: '002'
           payload_hex: '0000000000000000'
           physical_delay: 0.00025
@@ -745,12 +750,12 @@ stages:
     outs:
     - path: data/processed/attacks/dos_attack.log
       hash: md5
-      md5: 2f9181ae5f43e5c59c3ecda45520157a
-      size: 40320084
+      md5: bc139e9014ff4f65745ba3ee1d27e33f
+      size: 40814084
     - path: data/processed/attacks/dos_labels.npy
       hash: md5
-      md5: 2036a7dc738b8408f94c79f2643f380a
-      size: 887721
+      md5: a58591f9144a17efe0198ef0491b95c5
+      size: 896721
   generate_attack@replay:
     cmd: python -m scripts.dvc_stages.generate_attack 
       attacks.active_scenario=replay
@@ -765,42 +770,42 @@ stages:
       size: 269026994
     - path: scripts/dvc_stages/generate_attack.py
       hash: md5
-      md5: cb71186405623a4644f9e1e357442a32
-      size: 5608
+      md5: b32203958049c07247255b63d8f1f41f
+      size: 5765
     - path: src/utils/attacks/common.py
       hash: md5
-      md5: e8399754d391d80c9689d7fb823375cd
-      size: 2390
+      md5: f218de3eb553fced9f8f76da89ef429c
+      size: 2273
     - path: src/utils/attacks/dos.py
       hash: md5
-      md5: 6acc33c2fbf557807ad187d5e3c33276
-      size: 1623
+      md5: 40475d839aabdca2d4b278191283f9f5
+      size: 1646
     - path: src/utils/attacks/frequency.py
       hash: md5
-      md5: 55366dade9c3a7c47bac2804e7a76c49
-      size: 1966
+      md5: 39a10222745ac3454740f916999e430f
+      size: 1852
     - path: src/utils/attacks/fuzzing.py
       hash: md5
-      md5: 28032cdfa5041711777aca453a7ef496
-      size: 2235
+      md5: 62319a3a54205d94f013e5d37b4357d3
+      size: 2132
     - path: src/utils/attacks/payload.py
       hash: md5
-      md5: eff737fc7fa77b0cddbec08c69e3bb3d
-      size: 3104
+      md5: 8bcffa1264cae40ce811a83c851442f1
+      size: 2956
     - path: src/utils/attacks/replay.py
       hash: md5
-      md5: 26c2de718af0754d64e6ccd61b9a9e0b
-      size: 1575
+      md5: 41bf47daaebb05974a09122d6fc701a1
+      size: 1482
     - path: src/utils/attacks/suspension.py
       hash: md5
-      md5: a0bebaabe2997cc1f837e4729bbb1f7e
-      size: 1643
+      md5: 90b198d269d8b2528960b509fa4d39d8
+      size: 1336
     params:
       params.yaml:
         attacks.replay:
           capture_start_row: 500
           start_row: 10000
-          duration_rows: 30000
+          duration_rows: 15000
           target_can_id_hex: all
           speed_factor: 1.0
           min_bus_gap: 0.0002
@@ -810,12 +815,12 @@ stages:
     outs:
     - path: data/processed/attacks/replay_attack.log
       hash: md5
-      md5: 714b85a19ef1a7165a4311b298e7f72c
-      size: 41719560
+      md5: f56b7a4177eac7dc900092c2c97b2cb2
+      size: 41036814
     - path: data/processed/attacks/replay_labels.npy
       hash: md5
-      md5: d7ec849cd5fb1635b7a0d6c36f67fc74
-      size: 916721
+      md5: e3df353218f185708b11f67f0900f126
+      size: 901721
   generate_attack@multi:
     cmd: python -m scripts.dvc_stages.generate_attack 
       attacks.active_scenario=multi
@@ -830,56 +835,56 @@ stages:
       size: 269026994
     - path: scripts/dvc_stages/generate_attack.py
       hash: md5
-      md5: cb71186405623a4644f9e1e357442a32
-      size: 5608
+      md5: b32203958049c07247255b63d8f1f41f
+      size: 5765
     - path: src/utils/attacks/common.py
       hash: md5
-      md5: e8399754d391d80c9689d7fb823375cd
-      size: 2390
+      md5: f218de3eb553fced9f8f76da89ef429c
+      size: 2273
     - path: src/utils/attacks/dos.py
       hash: md5
-      md5: 6acc33c2fbf557807ad187d5e3c33276
-      size: 1623
+      md5: 40475d839aabdca2d4b278191283f9f5
+      size: 1646
     - path: src/utils/attacks/frequency.py
       hash: md5
-      md5: 55366dade9c3a7c47bac2804e7a76c49
-      size: 1966
+      md5: 39a10222745ac3454740f916999e430f
+      size: 1852
     - path: src/utils/attacks/fuzzing.py
       hash: md5
-      md5: 28032cdfa5041711777aca453a7ef496
-      size: 2235
+      md5: 62319a3a54205d94f013e5d37b4357d3
+      size: 2132
     - path: src/utils/attacks/payload.py
       hash: md5
-      md5: eff737fc7fa77b0cddbec08c69e3bb3d
-      size: 3104
+      md5: 8bcffa1264cae40ce811a83c851442f1
+      size: 2956
     - path: src/utils/attacks/replay.py
       hash: md5
-      md5: 26c2de718af0754d64e6ccd61b9a9e0b
-      size: 1575
+      md5: 41bf47daaebb05974a09122d6fc701a1
+      size: 1482
     - path: src/utils/attacks/suspension.py
       hash: md5
-      md5: a0bebaabe2997cc1f837e4729bbb1f7e
-      size: 1643
+      md5: 90b198d269d8b2528960b509fa4d39d8
+      size: 1336
     params:
       params.yaml:
         attacks.multi:
           steps:
           - type: dos
-            start_row: 5000
-            duration_rows: 1000
+            start_row: 8000
+            duration_rows: 8000
             can_id_hex: '002'
             payload_hex: '0000000000000000'
             physical_delay: 0.00025
           - type: replay
             capture_start_row: 500
-            start_row: 11000
-            duration_rows: 1000
+            start_row: 25000
+            duration_rows: 5000
             target_can_id_hex: all
             speed_factor: 1.0
             min_bus_gap: 0.0002
           - type: payload
-            start_row: 17000
-            duration_rows: 1500
+            start_row: 40000
+            duration_rows: 6000
             target_can_id_hex: '130'
             mode: random
             target_bytes:
@@ -895,22 +900,22 @@ stages:
             drift_step: 2
             seed: 42
           - type: frequency
-            start_row: 23000
-            duration_rows: 1500
+            start_row: 55000
+            duration_rows: 6000
             target_can_id_hex: '130'
             freq_multiplier: 5
             min_bus_gap: 0.0002
           - type: fuzzing
-            start_row: 30000
-            num_frames: 600
+            start_row: 72000
+            num_frames: 2500
             id_mode: random
             interval_min: 0.0005
             interval_max: 0.003
             min_bus_gap: 0.0002
             seed: 42
           - type: suspension
-            start_row: 37000
-            duration_rows: 1500
+            start_row: 90000
+            duration_rows: 6000
             target_can_id_hex: '130'
         parsing.raw_file: candump-2026-04-28_162402.log
         preprocessing.train_ratio: 0.7
@@ -918,12 +923,12 @@ stages:
     outs:
     - path: data/processed/attacks/multi_attack.log
       hash: md5
-      md5: 677cd30b85f8a0072e544e4f83e4c472
-      size: 40416534
+      md5: 1ca12bc3bac12f7b91d0af385b04102f
+      size: 41118480
     - path: data/processed/attacks/multi_labels.npy
       hash: md5
-      md5: 7a81da9063abb69d9d223fd38139f366
-      size: 889611
+      md5: 1ec2787d92461f2d399eaf59894bee83
+      size: 903391
   preprocess_attack@dos:
     cmd: python -m scripts.dvc_stages.preprocess_attack 
       attacks.active_scenario=dos
@@ -934,12 +939,12 @@ stages:
       size: 1629
     - path: data/processed/attacks/dos_attack.log
       hash: md5
-      md5: 2f9181ae5f43e5c59c3ecda45520157a
-      size: 40320084
+      md5: bc139e9014ff4f65745ba3ee1d27e33f
+      size: 40814084
     - path: data/processed/attacks/dos_labels.npy
       hash: md5
-      md5: 2036a7dc738b8408f94c79f2643f380a
-      size: 887721
+      md5: a58591f9144a17efe0198ef0491b95c5
+      size: 896721
     - path: scripts/dvc_stages/preprocess_attack.py
       hash: md5
       md5: 01a67d42a4b519f6d18676e9d36ab69f
@@ -967,8 +972,8 @@ stages:
     outs:
     - path: data/processed/attacks/dos_scaled.npy
       hash: md5
-      md5: e0290e040f0f76d120a4f498efe63d3e
-      size: 92309800
+      md5: 92cca6c0af98cafc295e6434d9ab7160
+      size: 93245800
   preprocess_attack@replay:
     cmd: python -m scripts.dvc_stages.preprocess_attack 
       attacks.active_scenario=replay
@@ -979,12 +984,12 @@ stages:
       size: 1629
     - path: data/processed/attacks/replay_attack.log
       hash: md5
-      md5: 714b85a19ef1a7165a4311b298e7f72c
-      size: 41719560
+      md5: f56b7a4177eac7dc900092c2c97b2cb2
+      size: 41036814
     - path: data/processed/attacks/replay_labels.npy
       hash: md5
-      md5: d7ec849cd5fb1635b7a0d6c36f67fc74
-      size: 916721
+      md5: e3df353218f185708b11f67f0900f126
+      size: 901721
     - path: scripts/dvc_stages/preprocess_attack.py
       hash: md5
       md5: 01a67d42a4b519f6d18676e9d36ab69f
@@ -1012,8 +1017,8 @@ stages:
     outs:
     - path: data/processed/attacks/replay_scaled.npy
       hash: md5
-      md5: 3b90795e27b959ccbe259d789502b725
-      size: 95325800
+      md5: 26fded007a0fe28d41d7fbda5ec7ca35
+      size: 93765800
   preprocess_attack@multi:
     cmd: python -m scripts.dvc_stages.preprocess_attack 
       attacks.active_scenario=multi
@@ -1024,12 +1029,12 @@ stages:
       size: 1629
     - path: data/processed/attacks/multi_attack.log
       hash: md5
-      md5: 677cd30b85f8a0072e544e4f83e4c472
-      size: 40416534
+      md5: 1ca12bc3bac12f7b91d0af385b04102f
+      size: 41118480
     - path: data/processed/attacks/multi_labels.npy
       hash: md5
-      md5: 7a81da9063abb69d9d223fd38139f366
-      size: 889611
+      md5: 1ec2787d92461f2d399eaf59894bee83
+      size: 903391
     - path: scripts/dvc_stages/preprocess_attack.py
       hash: md5
       md5: 01a67d42a4b519f6d18676e9d36ab69f
@@ -1057,8 +1062,8 @@ stages:
     outs:
     - path: data/processed/attacks/multi_scaled.npy
       hash: md5
-      md5: 83ecb33039639dc097e120c024b8bba3
-      size: 92506360
+      md5: d72503e599261af2e80751961d876456
+      size: 93939480
   evaluate_attack@dos:
     cmd: python -m scripts.dvc_stages.evaluate_attack 
       attacks.active_scenario=dos
@@ -1069,27 +1074,27 @@ stages:
       size: 1629
     - path: data/processed/attacks/dos_labels.npy
       hash: md5
-      md5: 2036a7dc738b8408f94c79f2643f380a
-      size: 887721
+      md5: a58591f9144a17efe0198ef0491b95c5
+      size: 896721
     - path: data/processed/attacks/dos_scaled.npy
       hash: md5
-      md5: e0290e040f0f76d120a4f498efe63d3e
-      size: 92309800
+      md5: 92cca6c0af98cafc295e6434d9ab7160
+      size: 93245800
     - path: reports/metrics/threshold.json
       hash: md5
-      md5: 03ee185044a10677717ea224db878faa
+      md5: d880af498fcbae1bf94d96ca5ac004c8
       size: 67
     - path: scripts/dvc_stages/evaluate_attack.py
       hash: md5
-      md5: 1e7b6a9e53dfdef387780ac50eb5b317
-      size: 3045
+      md5: cf620135bf64b2e070897d9e14e58626
+      size: 2963
     - path: src/models/ae_lstm.py
       hash: md5
       md5: 07bc074f8ae66f7e63c42cecb1c4f6ad
       size: 2160
-    - path: src/models/weights/ae_lstm_can_model_h64_e500.pth
+    - path: src/models/weights/ae_lstm_can_model_h64_e400.pth
       hash: md5
-      md5: 9f5759ecfe3a39999be682215611afca
+      md5: ac612400f3ab91f8931772fa242f3ec8
       size: 247191
     - path: src/utils/FastTensorDataLoader.py
       hash: md5
@@ -1097,12 +1102,16 @@ stages:
       size: 1060
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
     - path: src/utils/evaluator.py
       hash: md5
-      md5: e46b5f6a4638c9eefc5ec5a2374cd2a5
-      size: 7194
+      md5: 8e298d72720fd57eb26cc31ddc56a704
+      size: 5778
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -1110,19 +1119,19 @@ stages:
         model.hidden_size: 64
         model.latent_dim: 16
         model.num_features: 26
-        model.path: ae_lstm_can_model_h64_e500.pth
+        model.path: ae_lstm_can_model_h64_e400.pth
         model.sequence_length: 64
         training.batch_size: 4096
         training.epochs: 400
     outs:
     - path: plots/dos_attack_reaction_h64_e400.svg
       hash: md5
-      md5: 0a95bbc20240bb170b7f75a64975604f
-      size: 204498
+      md5: 7ffd3ab843bd4236be6cd307686cd4a9
+      size: 234088
     - path: reports/metrics/dos_metrics.json
       hash: md5
-      md5: dbcef9bc03c967218cffa069333a26e5
-      size: 1382
+      md5: d376ff4f24aedaabcdfa926e13a58b8c
+      size: 1406
   evaluate_attack@replay:
     cmd: python -m scripts.dvc_stages.evaluate_attack 
       attacks.active_scenario=replay
@@ -1133,27 +1142,27 @@ stages:
       size: 1629
     - path: data/processed/attacks/replay_labels.npy
       hash: md5
-      md5: d7ec849cd5fb1635b7a0d6c36f67fc74
-      size: 916721
+      md5: e3df353218f185708b11f67f0900f126
+      size: 901721
     - path: data/processed/attacks/replay_scaled.npy
       hash: md5
-      md5: 3b90795e27b959ccbe259d789502b725
-      size: 95325800
+      md5: 26fded007a0fe28d41d7fbda5ec7ca35
+      size: 93765800
     - path: reports/metrics/threshold.json
       hash: md5
-      md5: 03ee185044a10677717ea224db878faa
+      md5: d880af498fcbae1bf94d96ca5ac004c8
       size: 67
     - path: scripts/dvc_stages/evaluate_attack.py
       hash: md5
-      md5: 1e7b6a9e53dfdef387780ac50eb5b317
-      size: 3045
+      md5: cf620135bf64b2e070897d9e14e58626
+      size: 2963
     - path: src/models/ae_lstm.py
       hash: md5
       md5: 07bc074f8ae66f7e63c42cecb1c4f6ad
       size: 2160
-    - path: src/models/weights/ae_lstm_can_model_h64_e500.pth
+    - path: src/models/weights/ae_lstm_can_model_h64_e400.pth
       hash: md5
-      md5: 9f5759ecfe3a39999be682215611afca
+      md5: ac612400f3ab91f8931772fa242f3ec8
       size: 247191
     - path: src/utils/FastTensorDataLoader.py
       hash: md5
@@ -1161,12 +1170,16 @@ stages:
       size: 1060
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
     - path: src/utils/evaluator.py
       hash: md5
-      md5: e46b5f6a4638c9eefc5ec5a2374cd2a5
-      size: 7194
+      md5: 8e298d72720fd57eb26cc31ddc56a704
+      size: 5778
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -1174,19 +1187,19 @@ stages:
         model.hidden_size: 64
         model.latent_dim: 16
         model.num_features: 26
-        model.path: ae_lstm_can_model_h64_e500.pth
+        model.path: ae_lstm_can_model_h64_e400.pth
         model.sequence_length: 64
         training.batch_size: 4096
         training.epochs: 400
     outs:
     - path: plots/replay_attack_reaction_h64_e400.svg
       hash: md5
-      md5: daff35569bab629acaf216039dabacce
-      size: 724082
+      md5: 9269e86a8d45cfec68148eb54f43f543
+      size: 633137
     - path: reports/metrics/replay_metrics.json
       hash: md5
-      md5: b885fa61fa3dc421929d0532b5eff959
-      size: 1414
+      md5: 95bd004b9d9a65a987876531fc30b8c4
+      size: 1415
   evaluate_attack@multi:
     cmd: python -m scripts.dvc_stages.evaluate_attack 
       attacks.active_scenario=multi
@@ -1197,27 +1210,27 @@ stages:
       size: 1629
     - path: data/processed/attacks/multi_labels.npy
       hash: md5
-      md5: 7a81da9063abb69d9d223fd38139f366
-      size: 889611
+      md5: 1ec2787d92461f2d399eaf59894bee83
+      size: 903391
     - path: data/processed/attacks/multi_scaled.npy
       hash: md5
-      md5: 83ecb33039639dc097e120c024b8bba3
-      size: 92506360
+      md5: d72503e599261af2e80751961d876456
+      size: 93939480
     - path: reports/metrics/threshold.json
       hash: md5
-      md5: 03ee185044a10677717ea224db878faa
+      md5: d880af498fcbae1bf94d96ca5ac004c8
       size: 67
     - path: scripts/dvc_stages/evaluate_attack.py
       hash: md5
-      md5: 1e7b6a9e53dfdef387780ac50eb5b317
-      size: 3045
+      md5: cf620135bf64b2e070897d9e14e58626
+      size: 2963
     - path: src/models/ae_lstm.py
       hash: md5
       md5: 07bc074f8ae66f7e63c42cecb1c4f6ad
       size: 2160
-    - path: src/models/weights/ae_lstm_can_model_h64_e500.pth
+    - path: src/models/weights/ae_lstm_can_model_h64_e400.pth
       hash: md5
-      md5: 9f5759ecfe3a39999be682215611afca
+      md5: ac612400f3ab91f8931772fa242f3ec8
       size: 247191
     - path: src/utils/FastTensorDataLoader.py
       hash: md5
@@ -1225,12 +1238,16 @@ stages:
       size: 1060
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
     - path: src/utils/evaluator.py
       hash: md5
-      md5: e46b5f6a4638c9eefc5ec5a2374cd2a5
-      size: 7194
+      md5: 8e298d72720fd57eb26cc31ddc56a704
+      size: 5778
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -1238,19 +1255,19 @@ stages:
         model.hidden_size: 64
         model.latent_dim: 16
         model.num_features: 26
-        model.path: ae_lstm_can_model_h64_e500.pth
+        model.path: ae_lstm_can_model_h64_e400.pth
         model.sequence_length: 64
         training.batch_size: 4096
         training.epochs: 400
     outs:
     - path: plots/multi_attack_reaction_h64_e400.svg
       hash: md5
-      md5: 7dd63884521b48e3d8aa849be81182ec
-      size: 393033
+      md5: 8680222ef0855427f591cb8ec4311b88
+      size: 701426
     - path: reports/metrics/multi_metrics.json
       hash: md5
-      md5: ddf9948229a624b35aaefc1c5b1016d7
-      size: 2675
+      md5: 35f3f0ecd1cdd83b420207d633bb57fa
+      size: 2694
   train_iforest:
     cmd: python -m scripts.dvc_stages.train_iforest
     deps:
@@ -1264,8 +1281,8 @@ stages:
       size: 1337
     - path: src/models/isolation_forest.py
       hash: md5
-      md5: 645f884460fcc87c6a417b77868a1785
-      size: 9122
+      md5: 22002a4f74b976b9467fbb3bbc5ae571
+      size: 8366
     params:
       params.yaml:
         iforest.contamination: auto
@@ -1291,32 +1308,32 @@ stages:
       size: 92205696
     - path: scripts/dvc_stages/evaluate_iforest.py
       hash: md5
-      md5: c063b7d133c4a1983e396930077fd05b
-      size: 1895
+      md5: c52645e1e57876b64489efec31cd9609
+      size: 1948
     - path: src/models/isolation_forest.py
       hash: md5
-      md5: 645f884460fcc87c6a417b77868a1785
-      size: 9122
+      md5: 22002a4f74b976b9467fbb3bbc5ae571
+      size: 8366
     - path: src/models/weights/isolation_forest_n200_summary.pkl
       hash: md5
       md5: 9b7e318162c80ca76243f7106e431000
       size: 2860687
     params:
       params.yaml:
+        attacks.eval_stride: 1
         detection.percentile: 99.9
         iforest.feature_mode: summary
         iforest.n_estimators: 200
         iforest.path: isolation_forest_n200_summary.pkl
         model.sequence_length: 64
-        model.sequence_step: 5
     outs:
     - path: plots/iforest_validation_score_n200.svg
       hash: md5
-      md5: deee906f603683de0c6aa90032b76fd6
-      size: 519354
+      md5: 16f782895bd7347b102a7d84cbe9e71e
+      size: 460990
     - path: reports/metrics/iforest_threshold.json
       hash: md5
-      md5: db9addf35df23d4ccf5ddc367a721fc5
+      md5: d33ad3dbb4f8952737b5415214ea34aa
       size: 158
   generate_attack@payload:
     cmd: python -m scripts.dvc_stages.generate_attack 
@@ -1332,41 +1349,41 @@ stages:
       size: 269026994
     - path: scripts/dvc_stages/generate_attack.py
       hash: md5
-      md5: cb71186405623a4644f9e1e357442a32
-      size: 5608
+      md5: b32203958049c07247255b63d8f1f41f
+      size: 5765
     - path: src/utils/attacks/common.py
       hash: md5
-      md5: e8399754d391d80c9689d7fb823375cd
-      size: 2390
+      md5: f218de3eb553fced9f8f76da89ef429c
+      size: 2273
     - path: src/utils/attacks/dos.py
       hash: md5
-      md5: 6acc33c2fbf557807ad187d5e3c33276
-      size: 1623
+      md5: 40475d839aabdca2d4b278191283f9f5
+      size: 1646
     - path: src/utils/attacks/frequency.py
       hash: md5
-      md5: 55366dade9c3a7c47bac2804e7a76c49
-      size: 1966
+      md5: 39a10222745ac3454740f916999e430f
+      size: 1852
     - path: src/utils/attacks/fuzzing.py
       hash: md5
-      md5: 28032cdfa5041711777aca453a7ef496
-      size: 2235
+      md5: 62319a3a54205d94f013e5d37b4357d3
+      size: 2132
     - path: src/utils/attacks/payload.py
       hash: md5
-      md5: eff737fc7fa77b0cddbec08c69e3bb3d
-      size: 3104
+      md5: 8bcffa1264cae40ce811a83c851442f1
+      size: 2956
     - path: src/utils/attacks/replay.py
       hash: md5
-      md5: 26c2de718af0754d64e6ccd61b9a9e0b
-      size: 1575
+      md5: 41bf47daaebb05974a09122d6fc701a1
+      size: 1482
     - path: src/utils/attacks/suspension.py
       hash: md5
-      md5: a0bebaabe2997cc1f837e4729bbb1f7e
-      size: 1643
+      md5: 90b198d269d8b2528960b509fa4d39d8
+      size: 1336
     params:
       params.yaml:
         attacks.payload:
           start_row: 15000
-          duration_rows: 2000
+          duration_rows: 8000
           target_can_id_hex: '130'
           mode: random
           target_bytes:
@@ -1387,11 +1404,11 @@ stages:
     outs:
     - path: data/processed/attacks/payload_attack.log
       hash: md5
-      md5: 55ff2b913c0a27d75dc364588449cbb2
+      md5: d83517db456310d67308172ac7524742
       size: 40354084
     - path: data/processed/attacks/payload_labels.npy
       hash: md5
-      md5: 79c669d6a95b6ce994c489bbc084d9fb
+      md5: 52f5b0a6705a574bb45201ad4cef1779
       size: 886721
   generate_attack@frequency:
     cmd: python -m scripts.dvc_stages.generate_attack 
@@ -1407,41 +1424,41 @@ stages:
       size: 269026994
     - path: scripts/dvc_stages/generate_attack.py
       hash: md5
-      md5: cb71186405623a4644f9e1e357442a32
-      size: 5608
+      md5: b32203958049c07247255b63d8f1f41f
+      size: 5765
     - path: src/utils/attacks/common.py
       hash: md5
-      md5: e8399754d391d80c9689d7fb823375cd
-      size: 2390
+      md5: f218de3eb553fced9f8f76da89ef429c
+      size: 2273
     - path: src/utils/attacks/dos.py
       hash: md5
-      md5: 6acc33c2fbf557807ad187d5e3c33276
-      size: 1623
+      md5: 40475d839aabdca2d4b278191283f9f5
+      size: 1646
     - path: src/utils/attacks/frequency.py
       hash: md5
-      md5: 55366dade9c3a7c47bac2804e7a76c49
-      size: 1966
+      md5: 39a10222745ac3454740f916999e430f
+      size: 1852
     - path: src/utils/attacks/fuzzing.py
       hash: md5
-      md5: 28032cdfa5041711777aca453a7ef496
-      size: 2235
+      md5: 62319a3a54205d94f013e5d37b4357d3
+      size: 2132
     - path: src/utils/attacks/payload.py
       hash: md5
-      md5: eff737fc7fa77b0cddbec08c69e3bb3d
-      size: 3104
+      md5: 8bcffa1264cae40ce811a83c851442f1
+      size: 2956
     - path: src/utils/attacks/replay.py
       hash: md5
-      md5: 26c2de718af0754d64e6ccd61b9a9e0b
-      size: 1575
+      md5: 41bf47daaebb05974a09122d6fc701a1
+      size: 1482
     - path: src/utils/attacks/suspension.py
       hash: md5
-      md5: a0bebaabe2997cc1f837e4729bbb1f7e
-      size: 1643
+      md5: 90b198d269d8b2528960b509fa4d39d8
+      size: 1336
     params:
       params.yaml:
         attacks.frequency:
           start_row: 20000
-          duration_rows: 2000
+          duration_rows: 8000
           target_can_id_hex: '130'
           freq_multiplier: 5
           min_bus_gap: 0.0002
@@ -1451,12 +1468,12 @@ stages:
     outs:
     - path: data/processed/attacks/frequency_attack.log
       hash: md5
-      md5: 2eee202016214c4e4bf68eaf804ac778
-      size: 40377820
+      md5: 0e94693dd7f4889ea2c28ad963ae6470
+      size: 40449580
     - path: data/processed/attacks/frequency_labels.npy
       hash: md5
-      md5: c049c32d470822d79d7efedf0bd1bcbf
-      size: 887237
+      md5: 47fdee8592bfebd516dab85739a57de3
+      size: 888797
   generate_attack@fuzzing:
     cmd: python -m scripts.dvc_stages.generate_attack 
       attacks.active_scenario=fuzzing
@@ -1471,41 +1488,41 @@ stages:
       size: 269026994
     - path: scripts/dvc_stages/generate_attack.py
       hash: md5
-      md5: cb71186405623a4644f9e1e357442a32
-      size: 5608
+      md5: b32203958049c07247255b63d8f1f41f
+      size: 5765
     - path: src/utils/attacks/common.py
       hash: md5
-      md5: e8399754d391d80c9689d7fb823375cd
-      size: 2390
+      md5: f218de3eb553fced9f8f76da89ef429c
+      size: 2273
     - path: src/utils/attacks/dos.py
       hash: md5
-      md5: 6acc33c2fbf557807ad187d5e3c33276
-      size: 1623
+      md5: 40475d839aabdca2d4b278191283f9f5
+      size: 1646
     - path: src/utils/attacks/frequency.py
       hash: md5
-      md5: 55366dade9c3a7c47bac2804e7a76c49
-      size: 1966
+      md5: 39a10222745ac3454740f916999e430f
+      size: 1852
     - path: src/utils/attacks/fuzzing.py
       hash: md5
-      md5: 28032cdfa5041711777aca453a7ef496
-      size: 2235
+      md5: 62319a3a54205d94f013e5d37b4357d3
+      size: 2132
     - path: src/utils/attacks/payload.py
       hash: md5
-      md5: eff737fc7fa77b0cddbec08c69e3bb3d
-      size: 3104
+      md5: 8bcffa1264cae40ce811a83c851442f1
+      size: 2956
     - path: src/utils/attacks/replay.py
       hash: md5
-      md5: 26c2de718af0754d64e6ccd61b9a9e0b
-      size: 1575
+      md5: 41bf47daaebb05974a09122d6fc701a1
+      size: 1482
     - path: src/utils/attacks/suspension.py
       hash: md5
-      md5: a0bebaabe2997cc1f837e4729bbb1f7e
-      size: 1643
+      md5: 90b198d269d8b2528960b509fa4d39d8
+      size: 1336
     params:
       params.yaml:
         attacks.fuzzing:
           start_row: 25000
-          num_frames: 800
+          num_frames: 3500
           id_mode: random
           interval_min: 0.0005
           interval_max: 0.003
@@ -1517,12 +1534,12 @@ stages:
     outs:
     - path: data/processed/attacks/fuzzing_attack.log
       hash: md5
-      md5: d0ae3c0be3c0ecccf9e5d740a3d0b077
-      size: 40390884
+      md5: 694dfc0d4cba44267f55e67bae37bd52
+      size: 40515084
     - path: data/processed/attacks/fuzzing_labels.npy
       hash: md5
-      md5: 21411c302905f386c0d9bef7bc5a592e
-      size: 887521
+      md5: 4c0ca9a6a205b2aa2400485846a46181
+      size: 890221
   generate_attack@suspension:
     cmd: python -m scripts.dvc_stages.generate_attack 
       attacks.active_scenario=suspension
@@ -1537,41 +1554,41 @@ stages:
       size: 269026994
     - path: scripts/dvc_stages/generate_attack.py
       hash: md5
-      md5: cb71186405623a4644f9e1e357442a32
-      size: 5608
+      md5: b32203958049c07247255b63d8f1f41f
+      size: 5765
     - path: src/utils/attacks/common.py
       hash: md5
-      md5: e8399754d391d80c9689d7fb823375cd
-      size: 2390
+      md5: f218de3eb553fced9f8f76da89ef429c
+      size: 2273
     - path: src/utils/attacks/dos.py
       hash: md5
-      md5: 6acc33c2fbf557807ad187d5e3c33276
-      size: 1623
+      md5: 40475d839aabdca2d4b278191283f9f5
+      size: 1646
     - path: src/utils/attacks/frequency.py
       hash: md5
-      md5: 55366dade9c3a7c47bac2804e7a76c49
-      size: 1966
+      md5: 39a10222745ac3454740f916999e430f
+      size: 1852
     - path: src/utils/attacks/fuzzing.py
       hash: md5
-      md5: 28032cdfa5041711777aca453a7ef496
-      size: 2235
+      md5: 62319a3a54205d94f013e5d37b4357d3
+      size: 2132
     - path: src/utils/attacks/payload.py
       hash: md5
-      md5: eff737fc7fa77b0cddbec08c69e3bb3d
-      size: 3104
+      md5: 8bcffa1264cae40ce811a83c851442f1
+      size: 2956
     - path: src/utils/attacks/replay.py
       hash: md5
-      md5: 26c2de718af0754d64e6ccd61b9a9e0b
-      size: 1575
+      md5: 41bf47daaebb05974a09122d6fc701a1
+      size: 1482
     - path: src/utils/attacks/suspension.py
       hash: md5
-      md5: a0bebaabe2997cc1f837e4729bbb1f7e
-      size: 1643
+      md5: 90b198d269d8b2528960b509fa4d39d8
+      size: 1336
     params:
       params.yaml:
         attacks.suspension:
           start_row: 30000
-          duration_rows: 2000
+          duration_rows: 8000
           target_can_id_hex: '130'
         parsing.raw_file: candump-2026-04-28_162402.log
         preprocessing.train_ratio: 0.7
@@ -1579,12 +1596,12 @@ stages:
     outs:
     - path: data/processed/attacks/suspension_attack.log
       hash: md5
-      md5: 42e4e066aaef3773864e87cbebc7f0b7
-      size: 40348104
+      md5: 5db487d91dd059c48f552c1e9647caae
+      size: 40330118
     - path: data/processed/attacks/suspension_labels.npy
       hash: md5
-      md5: 1308d4a74807c2679f889e56cb209af7
-      size: 886591
+      md5: 41617e8a12771893ed793d007cd31b79
+      size: 886200
   preprocess_attack@payload:
     cmd: python -m scripts.dvc_stages.preprocess_attack 
       attacks.active_scenario=payload
@@ -1595,11 +1612,11 @@ stages:
       size: 1629
     - path: data/processed/attacks/payload_attack.log
       hash: md5
-      md5: 55ff2b913c0a27d75dc364588449cbb2
+      md5: d83517db456310d67308172ac7524742
       size: 40354084
     - path: data/processed/attacks/payload_labels.npy
       hash: md5
-      md5: 79c669d6a95b6ce994c489bbc084d9fb
+      md5: 52f5b0a6705a574bb45201ad4cef1779
       size: 886721
     - path: scripts/dvc_stages/preprocess_attack.py
       hash: md5
@@ -1628,7 +1645,7 @@ stages:
     outs:
     - path: data/processed/attacks/payload_scaled.npy
       hash: md5
-      md5: 817c9ecde4fc23f75113d5f3b745d561
+      md5: 771673f44a8bd604c16d5d14bfe0ad03
       size: 92205800
   preprocess_attack@frequency:
     cmd: python -m scripts.dvc_stages.preprocess_attack 
@@ -1640,12 +1657,12 @@ stages:
       size: 1629
     - path: data/processed/attacks/frequency_attack.log
       hash: md5
-      md5: 2eee202016214c4e4bf68eaf804ac778
-      size: 40377820
+      md5: 0e94693dd7f4889ea2c28ad963ae6470
+      size: 40449580
     - path: data/processed/attacks/frequency_labels.npy
       hash: md5
-      md5: c049c32d470822d79d7efedf0bd1bcbf
-      size: 887237
+      md5: 47fdee8592bfebd516dab85739a57de3
+      size: 888797
     - path: scripts/dvc_stages/preprocess_attack.py
       hash: md5
       md5: 01a67d42a4b519f6d18676e9d36ab69f
@@ -1673,8 +1690,8 @@ stages:
     outs:
     - path: data/processed/attacks/frequency_scaled.npy
       hash: md5
-      md5: deda244cda8960266bb987272d658b41
-      size: 92259464
+      md5: 1d18e4350f89da5d7232ae00c87c1710
+      size: 92421704
   preprocess_attack@fuzzing:
     cmd: python -m scripts.dvc_stages.preprocess_attack 
       attacks.active_scenario=fuzzing
@@ -1685,12 +1702,12 @@ stages:
       size: 1629
     - path: data/processed/attacks/fuzzing_attack.log
       hash: md5
-      md5: d0ae3c0be3c0ecccf9e5d740a3d0b077
-      size: 40390884
+      md5: 694dfc0d4cba44267f55e67bae37bd52
+      size: 40515084
     - path: data/processed/attacks/fuzzing_labels.npy
       hash: md5
-      md5: 21411c302905f386c0d9bef7bc5a592e
-      size: 887521
+      md5: 4c0ca9a6a205b2aa2400485846a46181
+      size: 890221
     - path: scripts/dvc_stages/preprocess_attack.py
       hash: md5
       md5: 01a67d42a4b519f6d18676e9d36ab69f
@@ -1718,8 +1735,8 @@ stages:
     outs:
     - path: data/processed/attacks/fuzzing_scaled.npy
       hash: md5
-      md5: addb42e16033aacb48318fb742b9009d
-      size: 92289000
+      md5: f3fa6af3ed551675fdedc564450e243a
+      size: 92569800
   preprocess_attack@suspension:
     cmd: python -m scripts.dvc_stages.preprocess_attack 
       attacks.active_scenario=suspension
@@ -1730,12 +1747,12 @@ stages:
       size: 1629
     - path: data/processed/attacks/suspension_attack.log
       hash: md5
-      md5: 42e4e066aaef3773864e87cbebc7f0b7
-      size: 40348104
+      md5: 5db487d91dd059c48f552c1e9647caae
+      size: 40330118
     - path: data/processed/attacks/suspension_labels.npy
       hash: md5
-      md5: 1308d4a74807c2679f889e56cb209af7
-      size: 886591
+      md5: 41617e8a12771893ed793d007cd31b79
+      size: 886200
     - path: scripts/dvc_stages/preprocess_attack.py
       hash: md5
       md5: 01a67d42a4b519f6d18676e9d36ab69f
@@ -1763,8 +1780,8 @@ stages:
     outs:
     - path: data/processed/attacks/suspension_scaled.npy
       hash: md5
-      md5: ad0f667706504d5236f0e6046d3341d3
-      size: 92192280
+      md5: af3656d35413475ce24c871278605208
+      size: 92151616
   evaluate_attack@payload:
     cmd: python -m scripts.dvc_stages.evaluate_attack 
       attacks.active_scenario=payload
@@ -1775,27 +1792,27 @@ stages:
       size: 1629
     - path: data/processed/attacks/payload_labels.npy
       hash: md5
-      md5: 79c669d6a95b6ce994c489bbc084d9fb
+      md5: 52f5b0a6705a574bb45201ad4cef1779
       size: 886721
     - path: data/processed/attacks/payload_scaled.npy
       hash: md5
-      md5: 817c9ecde4fc23f75113d5f3b745d561
+      md5: 771673f44a8bd604c16d5d14bfe0ad03
       size: 92205800
     - path: reports/metrics/threshold.json
       hash: md5
-      md5: 03ee185044a10677717ea224db878faa
+      md5: d880af498fcbae1bf94d96ca5ac004c8
       size: 67
     - path: scripts/dvc_stages/evaluate_attack.py
       hash: md5
-      md5: 1e7b6a9e53dfdef387780ac50eb5b317
-      size: 3045
+      md5: cf620135bf64b2e070897d9e14e58626
+      size: 2963
     - path: src/models/ae_lstm.py
       hash: md5
       md5: 07bc074f8ae66f7e63c42cecb1c4f6ad
       size: 2160
-    - path: src/models/weights/ae_lstm_can_model_h64_e500.pth
+    - path: src/models/weights/ae_lstm_can_model_h64_e400.pth
       hash: md5
-      md5: 9f5759ecfe3a39999be682215611afca
+      md5: ac612400f3ab91f8931772fa242f3ec8
       size: 247191
     - path: src/utils/FastTensorDataLoader.py
       hash: md5
@@ -1803,12 +1820,16 @@ stages:
       size: 1060
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
     - path: src/utils/evaluator.py
       hash: md5
-      md5: e46b5f6a4638c9eefc5ec5a2374cd2a5
-      size: 7194
+      md5: 8e298d72720fd57eb26cc31ddc56a704
+      size: 5778
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -1816,19 +1837,19 @@ stages:
         model.hidden_size: 64
         model.latent_dim: 16
         model.num_features: 26
-        model.path: ae_lstm_can_model_h64_e500.pth
+        model.path: ae_lstm_can_model_h64_e400.pth
         model.sequence_length: 64
         training.batch_size: 4096
         training.epochs: 400
     outs:
     - path: plots/payload_attack_reaction_h64_e400.svg
       hash: md5
-      md5: d5883548917799f60225dc6ea57f30a2
-      size: 363572
+      md5: bad83fce3a45f0074982ac560e4382d5
+      size: 440043
     - path: reports/metrics/payload_metrics.json
       hash: md5
-      md5: 0b2d82d538e31ac6839806c97ce92c4e
-      size: 1358
+      md5: f086850d498d9a6f71c59b35e1295884
+      size: 1362
   evaluate_attack@frequency:
     cmd: python -m scripts.dvc_stages.evaluate_attack 
       attacks.active_scenario=frequency
@@ -1839,27 +1860,27 @@ stages:
       size: 1629
     - path: data/processed/attacks/frequency_labels.npy
       hash: md5
-      md5: c049c32d470822d79d7efedf0bd1bcbf
-      size: 887237
+      md5: 47fdee8592bfebd516dab85739a57de3
+      size: 888797
     - path: data/processed/attacks/frequency_scaled.npy
       hash: md5
-      md5: deda244cda8960266bb987272d658b41
-      size: 92259464
+      md5: 1d18e4350f89da5d7232ae00c87c1710
+      size: 92421704
     - path: reports/metrics/threshold.json
       hash: md5
-      md5: 03ee185044a10677717ea224db878faa
+      md5: d880af498fcbae1bf94d96ca5ac004c8
       size: 67
     - path: scripts/dvc_stages/evaluate_attack.py
       hash: md5
-      md5: 1e7b6a9e53dfdef387780ac50eb5b317
-      size: 3045
+      md5: cf620135bf64b2e070897d9e14e58626
+      size: 2963
     - path: src/models/ae_lstm.py
       hash: md5
       md5: 07bc074f8ae66f7e63c42cecb1c4f6ad
       size: 2160
-    - path: src/models/weights/ae_lstm_can_model_h64_e500.pth
+    - path: src/models/weights/ae_lstm_can_model_h64_e400.pth
       hash: md5
-      md5: 9f5759ecfe3a39999be682215611afca
+      md5: ac612400f3ab91f8931772fa242f3ec8
       size: 247191
     - path: src/utils/FastTensorDataLoader.py
       hash: md5
@@ -1867,12 +1888,16 @@ stages:
       size: 1060
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
     - path: src/utils/evaluator.py
       hash: md5
-      md5: e46b5f6a4638c9eefc5ec5a2374cd2a5
-      size: 7194
+      md5: 8e298d72720fd57eb26cc31ddc56a704
+      size: 5778
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -1880,19 +1905,19 @@ stages:
         model.hidden_size: 64
         model.latent_dim: 16
         model.num_features: 26
-        model.path: ae_lstm_can_model_h64_e500.pth
+        model.path: ae_lstm_can_model_h64_e400.pth
         model.sequence_length: 64
         training.batch_size: 4096
         training.epochs: 400
     outs:
     - path: plots/frequency_attack_reaction_h64_e400.svg
       hash: md5
-      md5: f2f3ab8a2f1b6266a91d4d789f3e1d90
-      size: 377602
+      md5: 2e7a8ecae9b502b31b63b3e9e41df0af
+      size: 481516
     - path: reports/metrics/frequency_metrics.json
       hash: md5
-      md5: e90854c9a4ed9e7a2835f2999047b145
-      size: 1417
+      md5: a1defeb60792521e57cbe90265578d09
+      size: 1423
   evaluate_attack@fuzzing:
     cmd: python -m scripts.dvc_stages.evaluate_attack 
       attacks.active_scenario=fuzzing
@@ -1903,27 +1928,27 @@ stages:
       size: 1629
     - path: data/processed/attacks/fuzzing_labels.npy
       hash: md5
-      md5: 21411c302905f386c0d9bef7bc5a592e
-      size: 887521
+      md5: 4c0ca9a6a205b2aa2400485846a46181
+      size: 890221
     - path: data/processed/attacks/fuzzing_scaled.npy
       hash: md5
-      md5: addb42e16033aacb48318fb742b9009d
-      size: 92289000
+      md5: f3fa6af3ed551675fdedc564450e243a
+      size: 92569800
     - path: reports/metrics/threshold.json
       hash: md5
-      md5: 03ee185044a10677717ea224db878faa
+      md5: d880af498fcbae1bf94d96ca5ac004c8
       size: 67
     - path: scripts/dvc_stages/evaluate_attack.py
       hash: md5
-      md5: 1e7b6a9e53dfdef387780ac50eb5b317
-      size: 3045
+      md5: cf620135bf64b2e070897d9e14e58626
+      size: 2963
     - path: src/models/ae_lstm.py
       hash: md5
       md5: 07bc074f8ae66f7e63c42cecb1c4f6ad
       size: 2160
-    - path: src/models/weights/ae_lstm_can_model_h64_e500.pth
+    - path: src/models/weights/ae_lstm_can_model_h64_e400.pth
       hash: md5
-      md5: 9f5759ecfe3a39999be682215611afca
+      md5: ac612400f3ab91f8931772fa242f3ec8
       size: 247191
     - path: src/utils/FastTensorDataLoader.py
       hash: md5
@@ -1931,12 +1956,16 @@ stages:
       size: 1060
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
     - path: src/utils/evaluator.py
       hash: md5
-      md5: e46b5f6a4638c9eefc5ec5a2374cd2a5
-      size: 7194
+      md5: 8e298d72720fd57eb26cc31ddc56a704
+      size: 5778
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -1944,19 +1973,19 @@ stages:
         model.hidden_size: 64
         model.latent_dim: 16
         model.num_features: 26
-        model.path: ae_lstm_can_model_h64_e500.pth
+        model.path: ae_lstm_can_model_h64_e400.pth
         model.sequence_length: 64
         training.batch_size: 4096
         training.epochs: 400
     outs:
     - path: plots/fuzzing_attack_reaction_h64_e400.svg
       hash: md5
-      md5: 8a0d4efca1060871272843dcd2d59edc
-      size: 376853
+      md5: dbad2802787b1f0d5bb67dad08e60dbf
+      size: 379605
     - path: reports/metrics/fuzzing_metrics.json
       hash: md5
-      md5: 52b262ae20066fd042f6741306aae3b7
-      size: 1412
+      md5: 784e0cb76fdf8886d4ce45fd418c4ebb
+      size: 1414
   evaluate_attack@suspension:
     cmd: python -m scripts.dvc_stages.evaluate_attack 
       attacks.active_scenario=suspension
@@ -1967,27 +1996,27 @@ stages:
       size: 1629
     - path: data/processed/attacks/suspension_labels.npy
       hash: md5
-      md5: 1308d4a74807c2679f889e56cb209af7
-      size: 886591
+      md5: 41617e8a12771893ed793d007cd31b79
+      size: 886200
     - path: data/processed/attacks/suspension_scaled.npy
       hash: md5
-      md5: ad0f667706504d5236f0e6046d3341d3
-      size: 92192280
+      md5: af3656d35413475ce24c871278605208
+      size: 92151616
     - path: reports/metrics/threshold.json
       hash: md5
-      md5: 03ee185044a10677717ea224db878faa
+      md5: d880af498fcbae1bf94d96ca5ac004c8
       size: 67
     - path: scripts/dvc_stages/evaluate_attack.py
       hash: md5
-      md5: 1e7b6a9e53dfdef387780ac50eb5b317
-      size: 3045
+      md5: cf620135bf64b2e070897d9e14e58626
+      size: 2963
     - path: src/models/ae_lstm.py
       hash: md5
       md5: 07bc074f8ae66f7e63c42cecb1c4f6ad
       size: 2160
-    - path: src/models/weights/ae_lstm_can_model_h64_e500.pth
+    - path: src/models/weights/ae_lstm_can_model_h64_e400.pth
       hash: md5
-      md5: 9f5759ecfe3a39999be682215611afca
+      md5: ac612400f3ab91f8931772fa242f3ec8
       size: 247191
     - path: src/utils/FastTensorDataLoader.py
       hash: md5
@@ -1995,12 +2024,16 @@ stages:
       size: 1060
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
     - path: src/utils/evaluator.py
       hash: md5
-      md5: e46b5f6a4638c9eefc5ec5a2374cd2a5
-      size: 7194
+      md5: 8e298d72720fd57eb26cc31ddc56a704
+      size: 5778
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -2008,19 +2041,19 @@ stages:
         model.hidden_size: 64
         model.latent_dim: 16
         model.num_features: 26
-        model.path: ae_lstm_can_model_h64_e500.pth
+        model.path: ae_lstm_can_model_h64_e400.pth
         model.sequence_length: 64
         training.batch_size: 4096
         training.epochs: 400
     outs:
     - path: plots/suspension_attack_reaction_h64_e400.svg
       hash: md5
-      md5: 0cafc8634e7c62d4cec904352ffd12cc
-      size: 369610
+      md5: 14cf3f090e484065bc422c79074f49b1
+      size: 413188
     - path: reports/metrics/suspension_metrics.json
       hash: md5
-      md5: 5a60b643b62927151654cdabb89b3a4a
-      size: 1420
+      md5: 1a8e4390ec9790fb1750c6ae47837e56
+      size: 1421
   evaluate_attack_iforest@dos:
     cmd: python -m scripts.dvc_stages.evaluate_attack_iforest 
       attacks.active_scenario=dos
@@ -2031,32 +2064,36 @@ stages:
       size: 1629
     - path: data/processed/attacks/dos_labels.npy
       hash: md5
-      md5: 2036a7dc738b8408f94c79f2643f380a
-      size: 887721
+      md5: a58591f9144a17efe0198ef0491b95c5
+      size: 896721
     - path: data/processed/attacks/dos_scaled.npy
       hash: md5
-      md5: e0290e040f0f76d120a4f498efe63d3e
-      size: 92309800
+      md5: 92cca6c0af98cafc295e6434d9ab7160
+      size: 93245800
     - path: reports/metrics/iforest_threshold.json
       hash: md5
-      md5: db9addf35df23d4ccf5ddc367a721fc5
+      md5: d33ad3dbb4f8952737b5415214ea34aa
       size: 158
     - path: scripts/dvc_stages/evaluate_attack_iforest.py
       hash: md5
-      md5: 0ff3fa018467ef282b8003df41bf8885
-      size: 2507
+      md5: 1c78006daa400d73688858cbfdc3c130
+      size: 2440
     - path: src/models/isolation_forest.py
       hash: md5
-      md5: 645f884460fcc87c6a417b77868a1785
-      size: 9122
+      md5: 22002a4f74b976b9467fbb3bbc5ae571
+      size: 8366
     - path: src/models/weights/isolation_forest_n200_summary.pkl
       hash: md5
       md5: 9b7e318162c80ca76243f7106e431000
       size: 2860687
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -2068,12 +2105,12 @@ stages:
     outs:
     - path: plots/iforest_dos_attack_reaction_n200.svg
       hash: md5
-      md5: 1d31c7e053c848a7caf67ca7673f9e97
-      size: 335711
+      md5: d501afde30f3c9bf9518c5d727b47d08
+      size: 319163
     - path: reports/metrics/iforest_dos_metrics.json
       hash: md5
-      md5: 2c2b5e3aae66f1ad740a5bff28f7063f
-      size: 1378
+      md5: 456e31177d9a110ce7a2a1dd12d0365c
+      size: 1377
   evaluate_attack_iforest@replay:
     cmd: python -m scripts.dvc_stages.evaluate_attack_iforest 
       attacks.active_scenario=replay
@@ -2084,32 +2121,36 @@ stages:
       size: 1629
     - path: data/processed/attacks/replay_labels.npy
       hash: md5
-      md5: d7ec849cd5fb1635b7a0d6c36f67fc74
-      size: 916721
+      md5: e3df353218f185708b11f67f0900f126
+      size: 901721
     - path: data/processed/attacks/replay_scaled.npy
       hash: md5
-      md5: 3b90795e27b959ccbe259d789502b725
-      size: 95325800
+      md5: 26fded007a0fe28d41d7fbda5ec7ca35
+      size: 93765800
     - path: reports/metrics/iforest_threshold.json
       hash: md5
-      md5: db9addf35df23d4ccf5ddc367a721fc5
+      md5: d33ad3dbb4f8952737b5415214ea34aa
       size: 158
     - path: scripts/dvc_stages/evaluate_attack_iforest.py
       hash: md5
-      md5: 0ff3fa018467ef282b8003df41bf8885
-      size: 2507
+      md5: 1c78006daa400d73688858cbfdc3c130
+      size: 2440
     - path: src/models/isolation_forest.py
       hash: md5
-      md5: 645f884460fcc87c6a417b77868a1785
-      size: 9122
+      md5: 22002a4f74b976b9467fbb3bbc5ae571
+      size: 8366
     - path: src/models/weights/isolation_forest_n200_summary.pkl
       hash: md5
       md5: 9b7e318162c80ca76243f7106e431000
       size: 2860687
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -2121,12 +2162,12 @@ stages:
     outs:
     - path: plots/iforest_replay_attack_reaction_n200.svg
       hash: md5
-      md5: 7970cf4500ea5bd34a9a958e70e9ceea
-      size: 782281
+      md5: 2fe102e8719c24c2a65cfb269c3cc718
+      size: 649248
     - path: reports/metrics/iforest_replay_metrics.json
       hash: md5
-      md5: 4aa4b64efdac0a2a5eb457b66ff43e83
-      size: 1342
+      md5: 0b5fbe2d1d7f6d3bbde24eff4a5215e1
+      size: 1351
   evaluate_attack_iforest@payload:
     cmd: python -m scripts.dvc_stages.evaluate_attack_iforest 
       attacks.active_scenario=payload
@@ -2137,32 +2178,36 @@ stages:
       size: 1629
     - path: data/processed/attacks/payload_labels.npy
       hash: md5
-      md5: 79c669d6a95b6ce994c489bbc084d9fb
+      md5: 52f5b0a6705a574bb45201ad4cef1779
       size: 886721
     - path: data/processed/attacks/payload_scaled.npy
       hash: md5
-      md5: 817c9ecde4fc23f75113d5f3b745d561
+      md5: 771673f44a8bd604c16d5d14bfe0ad03
       size: 92205800
     - path: reports/metrics/iforest_threshold.json
       hash: md5
-      md5: db9addf35df23d4ccf5ddc367a721fc5
+      md5: d33ad3dbb4f8952737b5415214ea34aa
       size: 158
     - path: scripts/dvc_stages/evaluate_attack_iforest.py
       hash: md5
-      md5: 0ff3fa018467ef282b8003df41bf8885
-      size: 2507
+      md5: 1c78006daa400d73688858cbfdc3c130
+      size: 2440
     - path: src/models/isolation_forest.py
       hash: md5
-      md5: 645f884460fcc87c6a417b77868a1785
-      size: 9122
+      md5: 22002a4f74b976b9467fbb3bbc5ae571
+      size: 8366
     - path: src/models/weights/isolation_forest_n200_summary.pkl
       hash: md5
       md5: 9b7e318162c80ca76243f7106e431000
       size: 2860687
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -2174,12 +2219,12 @@ stages:
     outs:
     - path: plots/iforest_payload_attack_reaction_n200.svg
       hash: md5
-      md5: 2a9421275056ba0bd0a68b64fa0c9f72
-      size: 373880
+      md5: 26af9e8ca8aa057a7c70e4ce60f0e621
+      size: 454464
     - path: reports/metrics/iforest_payload_metrics.json
       hash: md5
-      md5: d6c7c656cdaa69c4fa384e5fa804ec83
-      size: 1352
+      md5: 1cd155cdcc0ee69c632d6757c5321d01
+      size: 1348
   evaluate_attack_iforest@frequency:
     cmd: python -m scripts.dvc_stages.evaluate_attack_iforest 
       attacks.active_scenario=frequency
@@ -2190,32 +2235,36 @@ stages:
       size: 1629
     - path: data/processed/attacks/frequency_labels.npy
       hash: md5
-      md5: c049c32d470822d79d7efedf0bd1bcbf
-      size: 887237
+      md5: 47fdee8592bfebd516dab85739a57de3
+      size: 888797
     - path: data/processed/attacks/frequency_scaled.npy
       hash: md5
-      md5: deda244cda8960266bb987272d658b41
-      size: 92259464
+      md5: 1d18e4350f89da5d7232ae00c87c1710
+      size: 92421704
     - path: reports/metrics/iforest_threshold.json
       hash: md5
-      md5: db9addf35df23d4ccf5ddc367a721fc5
+      md5: d33ad3dbb4f8952737b5415214ea34aa
       size: 158
     - path: scripts/dvc_stages/evaluate_attack_iforest.py
       hash: md5
-      md5: 0ff3fa018467ef282b8003df41bf8885
-      size: 2507
+      md5: 1c78006daa400d73688858cbfdc3c130
+      size: 2440
     - path: src/models/isolation_forest.py
       hash: md5
-      md5: 645f884460fcc87c6a417b77868a1785
-      size: 9122
+      md5: 22002a4f74b976b9467fbb3bbc5ae571
+      size: 8366
     - path: src/models/weights/isolation_forest_n200_summary.pkl
       hash: md5
       md5: 9b7e318162c80ca76243f7106e431000
       size: 2860687
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -2227,12 +2276,12 @@ stages:
     outs:
     - path: plots/iforest_frequency_attack_reaction_n200.svg
       hash: md5
-      md5: fca70546136879d726d3530d4a62ef17
-      size: 402451
+      md5: eea15740bbe5aa79ff34c1856bb693dc
+      size: 534223
     - path: reports/metrics/iforest_frequency_metrics.json
       hash: md5
-      md5: 44eb79dc635cf991525e0adb64d36365
-      size: 1394
+      md5: 63322de914960ff5797b1728086b5e3d
+      size: 1398
   evaluate_attack_iforest@fuzzing:
     cmd: python -m scripts.dvc_stages.evaluate_attack_iforest 
       attacks.active_scenario=fuzzing
@@ -2243,32 +2292,36 @@ stages:
       size: 1629
     - path: data/processed/attacks/fuzzing_labels.npy
       hash: md5
-      md5: 21411c302905f386c0d9bef7bc5a592e
-      size: 887521
+      md5: 4c0ca9a6a205b2aa2400485846a46181
+      size: 890221
     - path: data/processed/attacks/fuzzing_scaled.npy
       hash: md5
-      md5: addb42e16033aacb48318fb742b9009d
-      size: 92289000
+      md5: f3fa6af3ed551675fdedc564450e243a
+      size: 92569800
     - path: reports/metrics/iforest_threshold.json
       hash: md5
-      md5: db9addf35df23d4ccf5ddc367a721fc5
+      md5: d33ad3dbb4f8952737b5415214ea34aa
       size: 158
     - path: scripts/dvc_stages/evaluate_attack_iforest.py
       hash: md5
-      md5: 0ff3fa018467ef282b8003df41bf8885
-      size: 2507
+      md5: 1c78006daa400d73688858cbfdc3c130
+      size: 2440
     - path: src/models/isolation_forest.py
       hash: md5
-      md5: 645f884460fcc87c6a417b77868a1785
-      size: 9122
+      md5: 22002a4f74b976b9467fbb3bbc5ae571
+      size: 8366
     - path: src/models/weights/isolation_forest_n200_summary.pkl
       hash: md5
       md5: 9b7e318162c80ca76243f7106e431000
       size: 2860687
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -2280,12 +2333,12 @@ stages:
     outs:
     - path: plots/iforest_fuzzing_attack_reaction_n200.svg
       hash: md5
-      md5: 8042db4a19fe6bb3d8a091f1487de405
-      size: 385375
+      md5: 290aacac3d82750129780f813ef5f6c2
+      size: 509328
     - path: reports/metrics/iforest_fuzzing_metrics.json
       hash: md5
-      md5: be00332af41d5a7724f84a13b5a6c77c
-      size: 1387
+      md5: fcde51a5ee19c17ab1e6259b9f9957ed
+      size: 1391
   evaluate_attack_iforest@suspension:
     cmd: python -m scripts.dvc_stages.evaluate_attack_iforest 
       attacks.active_scenario=suspension
@@ -2296,32 +2349,36 @@ stages:
       size: 1629
     - path: data/processed/attacks/suspension_labels.npy
       hash: md5
-      md5: 1308d4a74807c2679f889e56cb209af7
-      size: 886591
+      md5: 41617e8a12771893ed793d007cd31b79
+      size: 886200
     - path: data/processed/attacks/suspension_scaled.npy
       hash: md5
-      md5: ad0f667706504d5236f0e6046d3341d3
-      size: 92192280
+      md5: af3656d35413475ce24c871278605208
+      size: 92151616
     - path: reports/metrics/iforest_threshold.json
       hash: md5
-      md5: db9addf35df23d4ccf5ddc367a721fc5
+      md5: d33ad3dbb4f8952737b5415214ea34aa
       size: 158
     - path: scripts/dvc_stages/evaluate_attack_iforest.py
       hash: md5
-      md5: 0ff3fa018467ef282b8003df41bf8885
-      size: 2507
+      md5: 1c78006daa400d73688858cbfdc3c130
+      size: 2440
     - path: src/models/isolation_forest.py
       hash: md5
-      md5: 645f884460fcc87c6a417b77868a1785
-      size: 9122
+      md5: 22002a4f74b976b9467fbb3bbc5ae571
+      size: 8366
     - path: src/models/weights/isolation_forest_n200_summary.pkl
       hash: md5
       md5: 9b7e318162c80ca76243f7106e431000
       size: 2860687
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -2333,12 +2390,12 @@ stages:
     outs:
     - path: plots/iforest_suspension_attack_reaction_n200.svg
       hash: md5
-      md5: b9bc11ab357b0f019e43f8eb0d1fdc53
-      size: 378405
+      md5: aab759b3b897c7c4a8fa59e2272bd6fa
+      size: 464730
     - path: reports/metrics/iforest_suspension_metrics.json
       hash: md5
-      md5: 93bbc0a7b138def791812005d811fdd1
-      size: 1396
+      md5: eecaf215c76d78520e702a8981b6bb14
+      size: 1398
   evaluate_attack_iforest@multi:
     cmd: python -m scripts.dvc_stages.evaluate_attack_iforest 
       attacks.active_scenario=multi
@@ -2349,32 +2406,36 @@ stages:
       size: 1629
     - path: data/processed/attacks/multi_labels.npy
       hash: md5
-      md5: 7a81da9063abb69d9d223fd38139f366
-      size: 889611
+      md5: 1ec2787d92461f2d399eaf59894bee83
+      size: 903391
     - path: data/processed/attacks/multi_scaled.npy
       hash: md5
-      md5: 83ecb33039639dc097e120c024b8bba3
-      size: 92506360
+      md5: d72503e599261af2e80751961d876456
+      size: 93939480
     - path: reports/metrics/iforest_threshold.json
       hash: md5
-      md5: db9addf35df23d4ccf5ddc367a721fc5
+      md5: d33ad3dbb4f8952737b5415214ea34aa
       size: 158
     - path: scripts/dvc_stages/evaluate_attack_iforest.py
       hash: md5
-      md5: 0ff3fa018467ef282b8003df41bf8885
-      size: 2507
+      md5: 1c78006daa400d73688858cbfdc3c130
+      size: 2440
     - path: src/models/isolation_forest.py
       hash: md5
-      md5: 645f884460fcc87c6a417b77868a1785
-      size: 9122
+      md5: 22002a4f74b976b9467fbb3bbc5ae571
+      size: 8366
     - path: src/models/weights/isolation_forest_n200_summary.pkl
       hash: md5
       md5: 9b7e318162c80ca76243f7106e431000
       size: 2860687
     - path: src/utils/evaluate_attack.py
       hash: md5
-      md5: 3384ed83c7b03176d3fa366f4368d626
-      size: 11200
+      md5: dec0bbe64b725f0c19542f5e294bcb2a
+      size: 10200
+    - path: src/utils/metrics.py
+      hash: md5
+      md5: 8802837177141510f9820b5f778e9ba6
+      size: 2929
     params:
       params.yaml:
         attacks.eval_stride: 1
@@ -2386,12 +2447,12 @@ stages:
     outs:
     - path: plots/iforest_multi_attack_reaction_n200.svg
       hash: md5
-      md5: c1b02b8bbfc1b18bb7141c46f90979a9
-      size: 720836
+      md5: 9cddc9919c72487fa7e100f32301995c
+      size: 895447
     - path: reports/metrics/iforest_multi_metrics.json
       hash: md5
-      md5: 71d4969ab3b5f6ca5e52140373be642d
-      size: 2649
+      md5: b86ec8586a120eae4615a486d15a1473
+      size: 2656
   compare_models:
     cmd: python -m scripts.dvc_stages.compare_models
     deps:
@@ -2401,60 +2462,60 @@ stages:
       size: 1629
     - path: reports/metrics/dos_metrics.json
       hash: md5
-      md5: dbcef9bc03c967218cffa069333a26e5
-      size: 1382
+      md5: d376ff4f24aedaabcdfa926e13a58b8c
+      size: 1406
     - path: reports/metrics/frequency_metrics.json
       hash: md5
-      md5: e90854c9a4ed9e7a2835f2999047b145
-      size: 1417
+      md5: a1defeb60792521e57cbe90265578d09
+      size: 1423
     - path: reports/metrics/fuzzing_metrics.json
       hash: md5
-      md5: 52b262ae20066fd042f6741306aae3b7
-      size: 1412
+      md5: 784e0cb76fdf8886d4ce45fd418c4ebb
+      size: 1414
     - path: reports/metrics/iforest_dos_metrics.json
       hash: md5
-      md5: 2c2b5e3aae66f1ad740a5bff28f7063f
-      size: 1378
+      md5: 456e31177d9a110ce7a2a1dd12d0365c
+      size: 1377
     - path: reports/metrics/iforest_frequency_metrics.json
       hash: md5
-      md5: 44eb79dc635cf991525e0adb64d36365
-      size: 1394
+      md5: 63322de914960ff5797b1728086b5e3d
+      size: 1398
     - path: reports/metrics/iforest_fuzzing_metrics.json
       hash: md5
-      md5: be00332af41d5a7724f84a13b5a6c77c
-      size: 1387
+      md5: fcde51a5ee19c17ab1e6259b9f9957ed
+      size: 1391
     - path: reports/metrics/iforest_multi_metrics.json
       hash: md5
-      md5: 71d4969ab3b5f6ca5e52140373be642d
-      size: 2649
+      md5: b86ec8586a120eae4615a486d15a1473
+      size: 2656
     - path: reports/metrics/iforest_payload_metrics.json
       hash: md5
-      md5: d6c7c656cdaa69c4fa384e5fa804ec83
-      size: 1352
+      md5: 1cd155cdcc0ee69c632d6757c5321d01
+      size: 1348
     - path: reports/metrics/iforest_replay_metrics.json
       hash: md5
-      md5: 4aa4b64efdac0a2a5eb457b66ff43e83
-      size: 1342
+      md5: 0b5fbe2d1d7f6d3bbde24eff4a5215e1
+      size: 1351
     - path: reports/metrics/iforest_suspension_metrics.json
       hash: md5
-      md5: 93bbc0a7b138def791812005d811fdd1
-      size: 1396
+      md5: eecaf215c76d78520e702a8981b6bb14
+      size: 1398
     - path: reports/metrics/multi_metrics.json
       hash: md5
-      md5: ddf9948229a624b35aaefc1c5b1016d7
-      size: 2675
+      md5: 35f3f0ecd1cdd83b420207d633bb57fa
+      size: 2694
     - path: reports/metrics/payload_metrics.json
       hash: md5
-      md5: 0b2d82d538e31ac6839806c97ce92c4e
-      size: 1358
+      md5: f086850d498d9a6f71c59b35e1295884
+      size: 1362
     - path: reports/metrics/replay_metrics.json
       hash: md5
-      md5: b885fa61fa3dc421929d0532b5eff959
-      size: 1414
+      md5: 95bd004b9d9a65a987876531fc30b8c4
+      size: 1415
     - path: reports/metrics/suspension_metrics.json
       hash: md5
-      md5: 5a60b643b62927151654cdabb89b3a4a
-      size: 1420
+      md5: 1a8e4390ec9790fb1750c6ae47837e56
+      size: 1421
     - path: scripts/dvc_stages/compare_models.py
       hash: md5
       md5: deb95fd0c38ebf30616284bd8e2bd5d3
@@ -2465,9 +2526,9 @@ stages:
     outs:
     - path: plots/model_comparison_ae_lstm_vs_iforest.svg
       hash: md5
-      md5: 28c1c6850cf552e6a42f86afce67daba
-      size: 112471
+      md5: 8b30f3ae14445332d512e47c0d9f92ef
+      size: 112468
     - path: reports/metrics/model_comparison.json
       hash: md5
-      md5: 641496395a66850b066e2a03ef023c0d
-      size: 25418
+      md5: 4ab06b1b699f133fa672700efdb7c42b
+      size: 25461
