@@ -12,7 +12,7 @@ preprocessing:
   val_ratio: 0.15
 
 model:
-  path: 'ae_lstm_can_model_h64_e500.pth'
+  path: 'ae_lstm_can_model_h64_e400.pth'
   sequence_length: 64
   sequence_step: 5
   hidden_size: 64

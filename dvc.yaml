@@ -32,28 +32,32 @@ stages:
       - data/processed/features/test_scaled.npy
 
 
-#  train:
-#    cmd: python -m scripts.dvc_stages.train
-#    deps:
-#      - scripts/dvc_stages/train.py
-#      - src/models/ae_lstm.py
-#      - src/utils/trainer.py
-#      - src/utils/FastTensorDataLoader.py
-#      - data/processed/features/train_scaled.npy
-#    params:
-#      - model.sequence_length
-#      - model.sequence_step
-#      - model.hidden_size
-#      - model.latent_dim
-#      - model.num_features
-#      - training.seed
-#      - training.epochs
-#      - training.batch_size
-#      - training.learning_rate
-#    outs:
-#      - src/models/weights/ae_lstm_can_model_h${model.hidden_size}_e${training.epochs}.pth
-#      - plots/training_loss_history/train_loss_h${model.hidden_size}_seed${training.seed}.svg
-#      - reports/metrics/history_h${model.hidden_size}_seed${training.seed}.json
+  train:
+    cmd: python -m scripts.dvc_stages.train
+    deps:
+      - scripts/dvc_stages/train.py
+      - src/models/ae_lstm.py
+      - src/utils/trainer.py
+      - src/utils/FastTensorDataLoader.py
+      - data/processed/features/train_scaled.npy
+      - data/processed/features/val_scaled.npy   # used for best-epoch selection and LR scheduling
+    params:
+      - model.path
+      - model.sequence_length
+      - model.sequence_step
+      - model.hidden_size
+      - model.latent_dim
+      - model.num_features
+      - training.seed
+      - training.epochs
+      - training.batch_size
+      - training.learning_rate
+    outs:
+      - src/models/weights/${model.path}
+      - plots/training_loss_history/train_loss_h${model.hidden_size}_seed${training.seed}.svg:
+          cache: false
+      - reports/metrics/history_h${model.hidden_size}_seed${training.seed}.json:
+          cache: false
 
 
   evaluate:

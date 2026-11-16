@@ -41,7 +41,8 @@ def main(cfg: DictConfig):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Training runs on: {device}")
 
-    model_path = (WEIGHTS_DIR / f"ae_lstm_can_model_h{cfg.model.hidden_size}_e{cfg.training.epochs}.pth")
+    # Single source of truth: the same file name is used by evaluate / evaluate_attack / the online IDS
+    model_path = WEIGHTS_DIR / str(cfg.model.path)
 
     seq_len = cfg.model.sequence_length
     seq_step = cfg.model.sequence_step
