@@ -43,8 +43,8 @@ attacks:
   eval_stride: 1
 
   dos:
-    start_row: 5000
-    duration_rows: 1000
+    start_row: 10000
+    duration_rows: 10000
     can_id_hex: '002'
     payload_hex: '0000000000000000'
     physical_delay: 0.00025
@@ -52,14 +52,14 @@ attacks:
   replay:
     capture_start_row: 500
     start_row: 10000
-    duration_rows: 30000
+    duration_rows: 15000
     target_can_id_hex: 'all'   # 'all' for multi-ECU block replay, or hex ID e.g. '130' for single-ECU replay
     speed_factor: 1.0
     min_bus_gap: 0.00020
 
   payload:
     start_row: 15000
-    duration_rows: 2000
+    duration_rows: 8000
     target_can_id_hex: '130'   # masquerade target ECU ('all' or specific hex ID e.g. '130', '316')
     mode: 'random'             # 'random', 'invert', 'constant', or 'drift'
     target_bytes: [0, 1, 2, 3, 4, 5, 6, 7]
@@ -69,14 +69,14 @@ attacks:
 
   frequency:
     start_row: 20000
-    duration_rows: 2000
+    duration_rows: 8000
     target_can_id_hex: '130'   # specific hex ID e.g. '130'
     freq_multiplier: 5         # N-x normal transmission rate (injects N-1 frames between original ones)
     min_bus_gap: 0.00020
 
   fuzzing:
     start_row: 25000
-    num_frames: 800
+    num_frames: 3500
     id_mode: 'random'          # 'random' (any 11-bit ID 0x000..0x7FF), 'legit' (only known ECU IDs), or 'mixed'
     interval_min: 0.0005
     interval_max: 0.0030
@@ -85,29 +85,29 @@ attacks:
 
   suspension:
     start_row: 30000
-    duration_rows: 2000
+    duration_rows: 8000
     target_can_id_hex: '130'   # ECU silenced via Bus-Off / UDS CommunicationControl
 
   multi:
     steps:
       - type: 'dos'
-        start_row: 5000
-        duration_rows: 1000
+        start_row: 8000
+        duration_rows: 8000
         can_id_hex: '002'
         payload_hex: '0000000000000000'
         physical_delay: 0.00025
 
       - type: 'replay'
         capture_start_row: 500
-        start_row: 11000
-        duration_rows: 1000
+        start_row: 25000
+        duration_rows: 5000
         target_can_id_hex: 'all'
         speed_factor: 1.0
         min_bus_gap: 0.00020
 
       - type: 'payload'
-        start_row: 17000
-        duration_rows: 1500
+        start_row: 40000
+        duration_rows: 6000
         target_can_id_hex: '130'
         mode: 'random'
         target_bytes: [0, 1, 2, 3, 4, 5, 6, 7]
@@ -116,15 +116,15 @@ attacks:
         seed: 42
 
       - type: 'frequency'
-        start_row: 23000
-        duration_rows: 1500
+        start_row: 55000
+        duration_rows: 6000
         target_can_id_hex: '130'
         freq_multiplier: 5
         min_bus_gap: 0.00020
 
       - type: 'fuzzing'
-        start_row: 30000
-        num_frames: 600
+        start_row: 72000
+        num_frames: 2500
         id_mode: 'random'
         interval_min: 0.0005
         interval_max: 0.0030
@@ -132,6 +132,6 @@ attacks:
         seed: 42
 
       - type: 'suspension'
-        start_row: 37000
-        duration_rows: 1500
+        start_row: 90000
+        duration_rows: 6000
         target_can_id_hex: '130'
