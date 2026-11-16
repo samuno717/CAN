@@ -16,7 +16,7 @@ from src.models.isolation_forest import (
 @hydra.main(version_base=None, config_path="../..", config_name="params")
 def main(cfg: DictConfig) -> None:
     seq_len = int(cfg.model.sequence_length)
-    seq_step = int(cfg.model.sequence_step)
+    seq_step = int(cfg.attacks.eval_stride)  # calibrate on the same stride as test / online IDS
     feature_mode = str(cfg.iforest.feature_mode)
 
     model_path = WEIGHTS_DIR / str(cfg.iforest.path)

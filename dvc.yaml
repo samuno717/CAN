@@ -74,7 +74,7 @@ stages:
       - model.hidden_size
       - model.latent_dim
       - model.sequence_length
-      - model.sequence_step
+      - attacks.eval_stride
       - model.num_features
       - training.batch_size
       - training.epochs
@@ -115,7 +115,7 @@ stages:
       - data/processed/features/val_scaled.npy
     params:
       - model.sequence_length
-      - model.sequence_step
+      - attacks.eval_stride
       - detection.percentile
       - iforest.path
       - iforest.n_estimators

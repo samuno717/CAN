@@ -40,7 +40,7 @@ def main(cfg: DictConfig):
         file_path=FEATURES_VAL_PATH,
         seq_len=seq_len,
         device=torch.device("cpu"),
-        stride=cfg.model.sequence_step,
+        stride=int(cfg.attacks.eval_stride),  # calibrate on the same stride as test / online IDS
     )
 
     eval_batch_size = min(int(cfg.training.batch_size), 2048) # temporary for low VRAM
