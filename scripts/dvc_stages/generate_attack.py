@@ -105,7 +105,7 @@ def apply_attack(df: pd.DataFrame, attack_type: str, step_cfg: DictConfig | dict
 
 @hydra.main(version_base=None, config_path="../..", config_name="params")
 def main(cfg: DictConfig) -> None:
-    scenario = str(cfg.attacks.active_scenario)
+    scenario = str(cfg.attacks.active_scenario).strip().lower()
     raw_log_path = RAW_DATA_DIR / cfg.parsing.raw_file
 
     df = load_test_raw_df(
@@ -115,7 +115,9 @@ def main(cfg: DictConfig) -> None:
     )
     clean_count = len(df)
 
-    if scenario == "multi":
+    if scenario in ("raw", "clean"):
+        logger.info(f"[{scenario}] Exporting clean 15% test split without any injected attacks...")
+    elif scenario == "multi":
         for step in cfg.attacks.multi.steps:
             df = apply_attack(df, str(step["type"]), step)
     else:
