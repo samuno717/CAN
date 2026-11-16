@@ -4,32 +4,9 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 from loguru import logger
-from numpy.lib.stride_tricks import sliding_window_view
 
 from config import ATTACK_COLORS, ATTACK_NAMES
-from src.utils.evaluator import apply_persistence_filter, calculate_metrics
-
-
-def align_window_labels(labels: np.ndarray, sequence_length: int = 64, stride: int = 1) -> np.ndarray:
-    """Assigns the dominant non-zero attack label to each window (or 0 if all frames are normal)."""
-    windows = sliding_window_view(labels, window_shape=sequence_length)[::stride]
-    has_attack = np.any(windows > 0, axis=1)
-    result = np.zeros(len(windows), dtype=np.int8)
-
-    if not np.any(has_attack):
-        return result
-
-    attack_windows = windows[has_attack]
-    unique_attack_ids = [int(c) for c in np.unique(attack_windows) if c > 0]
-
-    if len(unique_attack_ids) == 1:
-        result[has_attack] = np.int8(unique_attack_ids[0])
-        return result
-
-    counts = np.stack([(attack_windows == cid).sum(axis=1) for cid in unique_attack_ids], axis=1)
-    dominant_idx = np.argmax(counts, axis=1)
-    result[has_attack] = np.array(unique_attack_ids, dtype=np.int8)[dominant_idx]
-    return result
+from src.utils.metrics import apply_persistence_filter, calculate_metrics
 
 
 def compute_detection_metrics(

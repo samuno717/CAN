@@ -10,11 +10,8 @@ from src.models.isolation_forest import (
     CANIsolationForest,
     extract_iforest_window_features,
 )
-from src.utils.evaluate_attack import (
-    align_window_labels,
-    compute_detection_metrics,
-    plot_attack_evaluation,
-)
+from src.utils.evaluate_attack import compute_detection_metrics, plot_attack_evaluation
+from src.utils.metrics import align_window_labels
 
 
 @hydra.main(version_base=None, config_path="../..", config_name="params")

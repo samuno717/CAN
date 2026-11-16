@@ -8,13 +8,10 @@ from omegaconf import DictConfig
 
 from config import METRICS_DIR, PLOTS_DIR, PROCESSED_ATTACKS_DIR, WEIGHTS_DIR
 from src.models.ae_lstm import AELSTM
-from src.utils.evaluate_attack import (
-    align_window_labels,
-    compute_detection_metrics,
-    plot_attack_evaluation,
-)
+from src.utils.evaluate_attack import compute_detection_metrics, plot_attack_evaluation
 from src.utils.evaluator import evaluate_model, load_sliding_windows
 from src.utils.FastTensorDataLoader import FastTensorDataLoader
+from src.utils.metrics import align_window_labels
 
 
 @hydra.main(version_base=None, config_path="../..", config_name="params")

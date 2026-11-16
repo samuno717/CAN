@@ -37,50 +37,6 @@ def load_sliding_windows(file_path: Path, seq_len: int, device: torch.device, st
     return windows
 
 
-def apply_persistence_filter(raw_preds: np.ndarray, k: int = 3) -> np.ndarray:
-    filtered = np.zeros_like(raw_preds, dtype=np.int8)
-    consecutive = 0
-    in_alarm = False
-
-    for i, is_anomaly in enumerate(raw_preds):
-        if is_anomaly == 1:
-            consecutive += 1
-            if consecutive >= k:
-                in_alarm = True
-        else:
-            consecutive = 0
-            in_alarm = False
-
-        if in_alarm:
-            filtered[i] = 1
-
-    return filtered
-
-
-def calculate_metrics(y_true: np.ndarray, y_pred: np.ndarray, threshold: float) -> dict:
-    tp = int(np.sum((y_true == 1) & (y_pred == 1)))
-    tn = int(np.sum((y_true == 0) & (y_pred == 0)))
-    fp = int(np.sum((y_true == 0) & (y_pred == 1)))
-    fn = int(np.sum((y_true == 1) & (y_pred == 0)))
-
-    precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
-    recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
-    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
-    fpr = fp / (fp + tn) if (fp + tn) > 0 else 0.0
-
-    return {
-        "threshold": float(threshold),
-        "precision": float(precision),
-        "recall": float(recall),
-        "f1_score": float(f1),
-        "false_positive_rate": float(fpr),
-        "true_negatives": tn,
-        "false_positives": fp,
-        "false_negatives": fn,
-        "true_positives": tp,
-    }
-
-
 def plot_reconstruction_errors(errors: np.ndarray, save_path: Path, cfg: DictConfig) -> None:
     mean_val = float(np.mean(errors))
     std_val = float(np.std(errors))

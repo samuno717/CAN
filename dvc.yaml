@@ -198,6 +198,7 @@ stages:
       deps:
         - scripts/dvc_stages/evaluate_attack.py
         - src/utils/evaluate_attack.py
+        - src/utils/metrics.py
         - config.py
         - src/utils/evaluator.py
         - src/utils/FastTensorDataLoader.py
@@ -239,6 +240,7 @@ stages:
         - scripts/dvc_stages/evaluate_attack_iforest.py
         - src/models/isolation_forest.py
         - src/utils/evaluate_attack.py
+        - src/utils/metrics.py
         - config.py
         - src/models/weights/${iforest.path}
         - reports/metrics/iforest_threshold.json
