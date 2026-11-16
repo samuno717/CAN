@@ -24,7 +24,7 @@ def inject_dos_df(
 
     start_row = max(1, min(start_row, len(work_df) - 1))
     part_before = work_df.iloc[:start_row].copy()
-    part_after = work_df.iloc[start_row:].copy()
+    part_after = work_df.iloc[start_row:].copy().reset_index(drop=True)
 
     last_ts = float(str(part_before.iloc[-1, 0]).strip("()"))
     next_ts = float(str(part_after.iloc[0, 0]).strip("()"))
